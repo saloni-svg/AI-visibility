@@ -75,7 +75,7 @@ npm run parse -- --run=<run id> --force     # re-parse one run
 | Variable | Default | Meaning |
 |---|---|---|
 | `OPENAI_MODEL` | `gpt-4.1-mini` | Model that answers prompts (with web search) |
-| `GEMINI_MODEL` | `gemini-2.5-flash` | Model that answers prompts (with Google Search) |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | Model that answers prompts (with Google Search) |
 | `PERPLEXITY_PRESET` | `fast` | Perplexity Agent API preset: `fast`, `low`, `medium`, `high`, `xhigh` (deeper = slower and pricier) |
 | `PERPLEXITY_MODEL` | (unset) | Use this model (e.g. `openai/gpt-5.6-sol`) with web search instead of the preset |
 | `PARSER_MODEL` | `gpt-4.1-mini` | Cheap OpenAI model that extracts the JSON |
