@@ -1,0 +1,41 @@
+// POST JSON and retry on rate limits (429) and server errors (5xx).
+export async function postJson(
+  url: string,
+  headers: Record<string, string>,
+  body: unknown,
+  retries = 3,
+): Promise<any> {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...headers },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(120_000),
+    });
+    if (res.ok) return res.json();
+
+    const text = await res.text();
+    const retryable = res.status === 429 || res.status >= 500;
+    if (!retryable || attempt >= retries) {
+      throw new Error(`HTTP ${res.status} from ${new URL(url).host}: ${text.slice(0, 500)}`);
+    }
+    await new Promise((r) => setTimeout(r, 2 ** attempt * 2000));
+  }
+}
+
+// Runs async tasks with at most `limit` in flight at once.
+export async function runPool<T>(items: T[], limit: number, worker: (item: T) => Promise<void>) {
+  const queue = [...items];
+  const runners = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+    while (queue.length) await worker(queue.shift()!);
+  });
+  await Promise.all(runners);
+}
+
+export function domainOf(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
