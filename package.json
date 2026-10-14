@@ -9,9 +9,11 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "track": "tsx scripts/track.ts",
-    "parse": "tsx scripts/parse.ts"
+    "parse": "tsx scripts/parse.ts",
+    "smoke:perplexity": "tsx scripts/smoke-perplexity.ts"
   },
   "dependencies": {
+    "@perplexity-ai/perplexity_ai": "^0.38.8",
     "@supabase/supabase-js": "^2.117.3",
     "next": "^16.4.0",
     "react": "^19.3.0",

@@ -19,10 +19,13 @@ export function envInt(name: string, fallback: number): number {
 export const config = {
   attemptsPerPrompt: envInt("ATTEMPTS_PER_PROMPT", 3),
   concurrency: envInt("CONCURRENCY", 4),
+  // Agent API preset: fast | low | medium | high | xhigh (deeper = slower and pricier)
+  perplexityPreset: process.env.PERPLEXITY_PRESET || "fast",
   models: {
     openai: process.env.OPENAI_MODEL || "gpt-4.1-mini",
     gemini: process.env.GEMINI_MODEL || "gemini-2.5-flash",
-    perplexity: process.env.PERPLEXITY_MODEL || "sonar",
+    // Optional: a provider/model ID such as "openai/gpt-5.6-sol". Unset = use the preset.
+    perplexity: process.env.PERPLEXITY_MODEL || undefined,
     parser: process.env.PARSER_MODEL || "gpt-4.1-mini",
   },
 };

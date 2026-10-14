@@ -54,7 +54,7 @@ Then fill in `.env`:
 - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`: in Supabase, under **Project Settings → API**
 - `OPENAI_API_KEY`: from platform.openai.com. It's used for both answering and parsing.
 - `GEMINI_API_KEY`: from aistudio.google.com
-- `PERPLEXITY_API_KEY`: from perplexity.ai/settings/api
+- `PERPLEXITY_API_KEY`: from the API Console at console.perplexity.ai. Check it works with `npm run smoke:perplexity`, which sends one small request and prints only the status and response shape.
 
 `.env` is in `.gitignore`, so your keys are never committed. If a provider's key is missing, the script skips that provider.
 
@@ -76,7 +76,8 @@ npm run parse -- --run=<run id> --force     # re-parse one run
 |---|---|---|
 | `OPENAI_MODEL` | `gpt-4.1-mini` | Model that answers prompts (with web search) |
 | `GEMINI_MODEL` | `gemini-2.5-flash` | Model that answers prompts (with Google Search) |
-| `PERPLEXITY_MODEL` | `sonar` | Perplexity model |
+| `PERPLEXITY_PRESET` | `fast` | Perplexity Agent API preset: `fast`, `low`, `medium`, `high`, `xhigh` (deeper = slower and pricier) |
+| `PERPLEXITY_MODEL` | (unset) | Use this model (e.g. `openai/gpt-5.6-sol`) with web search instead of the preset |
 | `PARSER_MODEL` | `gpt-4.1-mini` | Cheap OpenAI model that extracts the JSON |
 | `ATTEMPTS_PER_PROMPT` | `3` | How many times each provider is asked each prompt |
 | `CONCURRENCY` | `4` | How many API calls run at the same time |
@@ -96,5 +97,6 @@ app/                                Next.js app (placeholder until the dashboard
 
 ## Notes
 
+- Perplexity answers come from the [Agent API](https://docs.perplexity.ai/docs/agent-api/quickstart) (`POST /v1/agent`) through the official `@perplexity-ai/perplexity_ai` SDK. Sources are the URLs the answer cites inline, followed by every page its web search returned.
 - Gemini returns redirect links (`vertexaisearch.cloud.google.com/...`) as sources. The real website domain is in the title, so that's what goes in `sources.domain`.
 - Row-level security is on for every table with no policies, so only the service role key (used by the scripts) can read or write. Read policies will be added with the dashboard.
