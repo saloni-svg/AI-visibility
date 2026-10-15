@@ -8,7 +8,7 @@ import { config } from "../lib/env";
 import { runPool } from "../lib/http";
 import { parseAnswers } from "../lib/parser";
 import { providers, type Provider } from "../lib/providers";
-import { supabase } from "../lib/supabase";
+import { db } from "../lib/supabase";
 
 const args = process.argv.slice(2);
 const providerFilter = args.find((a) => a.startsWith("--providers="))?.split("=")[1]?.split(",");
@@ -27,12 +27,12 @@ async function main() {
   if (!active.length) throw new Error("No providers to run. Check your API keys in .env.");
 
   // 2. Load the prompts to ask.
-  const { data: prompts, error } = await supabase.from("prompts").select("id, text").eq("active", true);
+  const { data: prompts, error } = await db().from("prompts").select("id, text").eq("active", true);
   if (error) throw error;
   if (!prompts?.length) throw new Error("No active prompts. Add some to the prompts table first.");
 
   // 3. Start a run so every answer from this execution is grouped together.
-  const { data: run, error: runErr } = await supabase.from("runs").insert({}).select("id").single();
+  const { data: run, error: runErr } = await db().from("runs").insert({}).select("id").single();
   if (runErr) throw runErr;
 
   const jobs = prompts.flatMap((prompt) =>
@@ -70,7 +70,7 @@ async function main() {
     }
     row.latency_ms = Date.now() - started;
 
-    const { error } = await supabase.from("answers").insert(row);
+    const { error } = await db().from("answers").insert(row);
     if (error) console.error(`  could not save answer: ${error.message}`);
     const label = `${provider.name} #${attempt} "${prompt.text.slice(0, 50)}"`;
     console.log(row.error ? `  x ${label}: ${row.error}` : `  ok ${label} (${row.latency_ms}ms)`);
@@ -80,7 +80,7 @@ async function main() {
   if (!skipParse) await parseAnswers({ runId: run.id });
 
   // 6. Close the run.
-  await supabase
+  await db()
     .from("runs")
     .update({
       status: ok > 0 ? "completed" : "failed",

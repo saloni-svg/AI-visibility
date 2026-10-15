@@ -1,7 +1,7 @@
 import { config, requireEnv } from "./env";
 import { domainOf, postJson, runPool } from "./http";
 import { providerByName, type ProviderName } from "./providers";
-import { supabase } from "./supabase";
+import { db } from "./supabase";
 
 export type ParsedAnswer = {
   brands: { name: string; position: number }[];
@@ -84,13 +84,13 @@ function matches(name: string, entity: Entity): boolean {
 }
 
 async function loadBrandContext(brandId: string): Promise<BrandContext> {
-  const { data: brand, error } = await supabase
+  const { data: brand, error } = await db()
     .from("brands")
     .select("id, name, domain, aliases")
     .eq("id", brandId)
     .single();
   if (error) throw error;
-  const { data: competitors, error: cErr } = await supabase
+  const { data: competitors, error: cErr } = await db()
     .from("competitors")
     .select("id, name, domain, aliases")
     .eq("brand_id", brandId);
@@ -111,8 +111,8 @@ async function parseOne(answer: AnswerRow, ctx: BrandContext) {
   const parsed = await extractWithModel(answer.answer_text, knownNames);
 
   // Clear any earlier results so re-parsing never creates duplicates.
-  await supabase.from("mentions").delete().eq("answer_id", answer.id);
-  await supabase.from("sources").delete().eq("answer_id", answer.id);
+  await db().from("mentions").delete().eq("answer_id", answer.id);
+  await db().from("sources").delete().eq("answer_id", answer.id);
 
   // Mentions: renumber positions 1..n so they are always consecutive.
   const seen = new Set<string>();
@@ -150,14 +150,14 @@ async function parseOne(answer: AnswerRow, ctx: BrandContext) {
   }));
 
   if (mentionRows.length) {
-    const { error } = await supabase.from("mentions").insert(mentionRows);
+    const { error } = await db().from("mentions").insert(mentionRows);
     if (error) throw error;
   }
   if (sourceRows.length) {
-    const { error } = await supabase.from("sources").insert(sourceRows);
+    const { error } = await db().from("sources").insert(sourceRows);
     if (error) throw error;
   }
-  const { error } = await supabase
+  const { error } = await db()
     .from("answers")
     .update({ parsed_at: new Date().toISOString() })
     .eq("id", answer.id);
@@ -169,7 +169,7 @@ async function parseOne(answer: AnswerRow, ctx: BrandContext) {
 // Parses every successful answer that has not been parsed yet.
 // Pass runId to limit to one run, force to re-parse already-parsed answers.
 export async function parseAnswers(opts: { runId?: string; force?: boolean; concurrency?: number } = {}) {
-  let query = supabase
+  let query = db()
     .from("answers")
     .select("id, provider, answer_text, raw_response, prompts!inner(brand_id)")
     .not("answer_text", "is", null);

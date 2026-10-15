@@ -2,7 +2,8 @@
 
 This project tracks how often AI assistants (ChatGPT/OpenAI, Gemini, Perplexity) mention your brand and your competitors, and which websites they cite.
 
-**Step 1 (this step):** the database and a data collection script. There's no dashboard yet.
+- **Step 1:** the database and a data collection script.
+- **Step 2:** a dashboard showing the results (`npm run dev`, then open http://localhost:3000).
 
 ## How it works
 
@@ -70,6 +71,24 @@ npm run parse -- --run=<run id> --force     # re-parse one run
 
 **Cost:** each run makes `prompts × providers × 3` AI calls, plus one parser call per answer. For example, 10 prompts give 90 answer calls and 90 parser calls.
 
+## The dashboard
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000. It reads straight from Supabase, so reload after each `npm run track`.
+
+- **Filters:** pick a run, and show all questions, only unbranded or only branded ones. Everything on the page follows the filters.
+- **Summary:** how often you're mentioned (with the change since the previous run), your average position, how often your own website is cited, and how many answers were analysed.
+- **You vs competitors:** mention rate per AI tool for you and each competitor.
+- **Over time:** your mention rate per AI tool across runs (needs 2+ runs).
+- **Who AI recommends:** every brand named in the answers, including ones you aren't tracking yet.
+- **Most-cited websites:** the sources the AIs rely on.
+- **Question by question:** for each prompt and AI tool, how many tries mentioned you and your best position.
+
+The dashboard uses the service role key on the server only; it is never sent to the browser. It has no login, so run it locally. Don't deploy it publicly until we add authentication.
+
 ## Settings (optional, in `.env`)
 
 | Variable | Default | Meaning |
@@ -92,7 +111,9 @@ lib/parser.ts                       cheap-model JSON extraction, brand matching,
 lib/env.ts                          loads .env and the settings above
 scripts/track.ts                    main script: ask, save, parse
 scripts/parse.ts                    re-run the parser on saved answers
-app/                                Next.js app (placeholder until the dashboard step)
+lib/dashboard.ts                    loads and summarises the data for the dashboard
+app/page.tsx                        dashboard page (loads the data)
+app/components/                     dashboard view, tooltips, run picker, trend chart
 ```
 
 ## Notes
