@@ -1,35 +1,30 @@
 import { signOut } from "../(auth)/actions";
+import Icon from "./Icon";
+import SidebarNav from "./SidebarNav";
 
-// Left side panel: app name, links to each dashboard section, and the
-// signed-in account with a log-out button.
-const SECTIONS = [
-  { id: "overview", label: "Overview" },
-  { id: "competitors", label: "You vs competitors" },
-  { id: "trend", label: "Over time" },
-  { id: "recommended", label: "Who AI recommends" },
-  { id: "sources", label: "Cited websites" },
-  { id: "questions", label: "Question by question" },
-];
-
+// Left side panel: logo, section links, and the signed-in account with log out.
 export default function Sidebar({ email }: { email: string }) {
+  const initials = email.slice(0, 2).toUpperCase();
   return (
     <aside className="sidebar">
-      <div className="sidebar-mark">AI Visibility</div>
-      <nav aria-label="Dashboard sections">
-        <p className="sidebar-heading">Dashboard</p>
-        <ul>
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a href={`#${s.id}`}>{s.label}</a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <div className="sidebar-account">
-        <p className="sidebar-heading">Signed in as</p>
-        <p className="sidebar-email" title={email}>{email}</p>
+      <div className="brand-lockup">
+        <span className="logo-mark"><Icon name="logo" size={18} /></span>
+        <div>
+          <div className="brand-name">AI Visibility</div>
+          <div className="brand-tag">Brand monitor</div>
+        </div>
+      </div>
+      <SidebarNav />
+      <div className="account">
+        <span className="avatar" aria-hidden="true">{initials}</span>
+        <div className="account-text">
+          <span className="account-label">Signed in as</span>
+          <span className="account-email" title={email}>{email}</span>
+        </div>
         <form action={signOut}>
-          <button type="submit" className="btn-secondary">Log out</button>
+          <button type="submit" className="icon-btn" aria-label="Log out" title="Log out">
+            <Icon name="logout" size={18} />
+          </button>
         </form>
       </div>
     </aside>

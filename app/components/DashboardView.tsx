@@ -1,6 +1,8 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { Dashboard, Provider, Rate, Scope } from "@/lib/dashboard";
 import HoverTips from "./HoverTips";
+import Icon, { type IconName } from "./Icon";
 import RunPicker from "./RunPicker";
 import TrendChart from "./TrendChart";
 
@@ -20,85 +22,73 @@ const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 // Draws the dashboard for already-loaded data.
 export default function DashboardView({ data }: { data: Extract<Dashboard, { state: "ok" }> }) {
-  const { scope } = data;
-  const { brand, kpis, providers } = data;
+  const { brand, kpis, providers, scope } = data;
   const series = providers.map((p) => ({ key: p, ...PROVIDER_META[p] }));
   const rateNow = share(kpis.mentionRate);
   const deltaPts = kpis.previousRate ? Math.round((rateNow - share(kpis.previousRate)) * 100) : null;
   const scopeLabel = scope === "all" ? "all" : scope;
 
   return (
-    <main>
-      <header>
-        <h1>AI visibility · {brand.name}</h1>
-        <p className="subtitle">How often ChatGPT, Gemini and Perplexity mention {brand.name} when people ask them for recommendations.</p>
+    <main className="dash">
+      <header className="page-header">
+        <div>
+          <p className="eyebrow">{brand.name}</p>
+          <h1>AI visibility overview</h1>
+          <p className="subtitle">How often ChatGPT, Gemini and Perplexity recommend {brand.name}.</p>
+        </div>
+        {/* Filters scope everything below them. */}
+        <div className="filters">
+          <RunPicker runs={data.runs} value={data.run.id} scope={scope} />
+          <nav className="segmented" aria-label="Question type">
+            {SCOPES.map((s) => (
+              <Link key={s.value} href={`/?run=${data.run.id}&type=${s.value}`} aria-current={s.value === scope}>
+                {s.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </header>
 
-      {/* Filters scope everything below them. */}
-      <div className="filters">
-        <RunPicker runs={data.runs} value={data.run.id} scope={scope} />
-        <nav className="segmented" aria-label="Question type">
-          {SCOPES.map((s) => (
-            <Link key={s.value} href={`/?run=${data.run.id}&type=${s.value}`} aria-current={s.value === scope}>
-              {s.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
       {kpis.answers === 0 ? (
-        <div className="card empty">
+        <div className="card empty-state">
+          <span className="empty-icon"><Icon name="database" size={22} /></span>
           <h2>No {scopeLabel} answers in this run</h2>
           <p className="note">Pick another run or question type.</p>
         </div>
       ) : (
         <>
-          <section id="overview" className="grid kpis" aria-label="Summary">
-            <div className="card tile-hero">
-              <div className="tile-label">Mentioned in</div>
-              <div className="tile-value">{pct(rateNow)}</div>
-              <div className="tile-sub">
-                of {scopeLabel} answers ({kpis.mentionRate.hits} of {kpis.mentionRate.total})
-              </div>
+          <section id="overview" className="kpis" aria-label="Summary">
+            <Stat icon="message" label="Mentioned in" value={pct(rateNow)} hero>
+              {kpis.mentionRate.hits} of {kpis.mentionRate.total} {scopeLabel} answers
               {deltaPts !== null && (
-                <div className={`delta ${deltaPts > 0 ? "delta-up" : deltaPts < 0 ? "delta-down" : ""}`}>
+                <span className={`delta ${deltaPts > 0 ? "delta-up" : deltaPts < 0 ? "delta-down" : ""}`}>
                   {deltaPts > 0 ? "▲ +" : deltaPts < 0 ? "▼ " : "■ "}
                   {deltaPts} pts vs previous run
-                </div>
+                </span>
               )}
-            </div>
-            <div className="card">
-              <div className="tile-label">Average position when mentioned</div>
-              <div className="tile-value">{kpis.avgPosition === null ? "–" : kpis.avgPosition.toFixed(1)}</div>
-              <div className="tile-sub">1 = the first brand the AI names</div>
-            </div>
-            <div className="card">
-              <div className="tile-label">Your website cited</div>
-              <div className="tile-value">{pct(share(kpis.siteCited))}</div>
-              <div className="tile-sub">
-                {kpis.siteCited.hits} of {kpis.siteCited.total} answers link to {brand.domain ?? "your domain"}
-              </div>
-            </div>
-            <div className="card">
-              <div className="tile-label">Answers analysed</div>
-              <div className="tile-value">{kpis.answers}</div>
-              <div className="tile-sub">from {providers.map((p) => PROVIDER_META[p].label).join(", ")}</div>
-            </div>
+            </Stat>
+            <Stat icon="hash" label="Average position" value={kpis.avgPosition === null ? "–" : kpis.avgPosition.toFixed(1)}>
+              When mentioned · 1 = named first
+            </Stat>
+            <Stat icon="link" label="Your website cited" value={pct(share(kpis.siteCited))}>
+              {kpis.siteCited.hits} of {kpis.siteCited.total} answers link to {brand.domain ?? "your site"}
+            </Stat>
+            <Stat icon="database" label="Answers analysed" value={String(kpis.answers)}>
+              From {providers.map((p) => PROVIDER_META[p].label).join(", ")}
+            </Stat>
           </section>
 
-          <section id="competitors" className="card" style={{ marginTop: 16 }}>
-            <div className="card-head">
-              <h2>Mention rate: you vs competitors</h2>
-              <p className="note">Share of {scopeLabel} answers from each AI tool that name the brand.</p>
-            </div>
+          <Card id="competitors" icon="users" title="You vs competitors" note={`Share of ${scopeLabel} answers from each AI tool that name the brand.`}>
             <Legend series={series} shape="rect" />
             <HoverTips>
               <div className="bars">
                 {data.entities.map((e) => (
                   <div className="bar-row" key={e.id}>
                     <div className="bar-name">
-                      {e.name}
-                      {e.isBrand && <span className="badge badge-you">You</span>}
+                      <span>
+                        {e.name}
+                        {e.isBrand && <span className="badge badge-you">You</span>}
+                      </span>
                       <small>{pct(share(e.overall))} overall</small>
                     </div>
                     <div className="bar-group">
@@ -123,18 +113,15 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                 ))}
               </div>
             </HoverTips>
-            {data.entities.length === 1 && (
-              <p className="note">Add competitors in Supabase to compare against them.</p>
-            )}
-          </section>
+            {data.entities.length === 1 && <p className="note">Add competitors in Supabase to compare against them.</p>}
+          </Card>
 
-          <section id="trend" className="card" style={{ marginTop: 16 }}>
-            <div className="card-head">
-              <h2>Your mention rate over time</h2>
-              <p className="note">{brand.name}&apos;s mention rate in {scopeLabel} answers, per run.</p>
-            </div>
+          <Card id="trend" icon="trend" title="Mention rate over time" note={`${brand.name}'s mention rate in ${scopeLabel} answers, per run.`}>
             {data.trend.length < 2 ? (
-              <p className="note">Only one run so far. Run <code>npm run track</code> again on another day to see a trend.</p>
+              <div className="inline-empty">
+                <Icon name="trend" />
+                <span>Only one run so far. Run <code>npm run track</code> again on another day to see a trend.</span>
+              </div>
             ) : (
               <>
                 <ul className="legend">
@@ -151,14 +138,10 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                 <TrendChart series={series} points={data.trend} />
               </>
             )}
-          </section>
+          </Card>
 
-          <div className="grid two">
-            <section id="recommended" className="card">
-              <div className="card-head">
-                <h2>Who AI recommends</h2>
-                <p className="note">Every brand named in these answers, by how many answers name it.</p>
-              </div>
+          <div className="two-col">
+            <Card id="recommended" icon="sparkles" title="Who AI recommends" note="Every brand named in these answers.">
               <HoverTips>
                 <div className="table-wrap">
                   <table>
@@ -196,15 +179,14 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                   </table>
                 </div>
               </HoverTips>
-            </section>
+            </Card>
 
-            <section id="sources" className="card">
-              <div className="card-head">
-                <h2>Most-cited websites</h2>
-                <p className="note">Sites the AIs used as sources. Being featured on these helps you get mentioned.</p>
-              </div>
+            <Card id="sources" icon="globe" title="Most-cited websites" note="Getting featured on these helps you get mentioned.">
               {data.topDomains.length === 0 ? (
-                <p className="note">No sources were cited in these answers.</p>
+                <div className="inline-empty">
+                  <Icon name="globe" />
+                  <span>No sources were cited in these answers.</span>
+                </div>
               ) : (
                 <HoverTips>
                   <div className="table-wrap">
@@ -241,18 +223,17 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                   </div>
                 </HoverTips>
               )}
-            </section>
+            </Card>
           </div>
 
-          <section id="questions" className="card" style={{ marginTop: 16 }}>
-            <div className="card-head">
-              <h2>Question by question</h2>
-              <p className="note">
-                How many tries mentioned {brand.name}, and its best position (#1 = named first). A dash means not mentioned.
-              </p>
-            </div>
+          <Card
+            id="questions"
+            icon="list"
+            title="Question by question"
+            note={`Tries that mentioned ${brand.name}, and its best position (#1 = named first).`}
+          >
             <div className="table-wrap">
-              <table>
+              <table className="questions">
                 <thead>
                   <tr>
                     <th>Question</th>
@@ -268,8 +249,8 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                   {data.prompts.map((p) => (
                     <tr key={p.text}>
                       <td>
-                        {p.text}
-                        <span className="badge">{p.type}</span>
+                        <span className="q-text">{p.text}</span>
+                        <span className={`badge badge-${p.type}`}>{p.type}</span>
                       </td>
                       {series.map((s) => {
                         const c = p.byProvider[s.key as Provider];
@@ -278,9 +259,9 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                             {!c ? (
                               <span className="muted">n/a</span>
                             ) : c.hits === 0 ? (
-                              <span className="muted">– 0/{c.total}</span>
+                              <span className="pill pill-miss">0/{c.total}</span>
                             ) : (
-                              <span className="cell-hit">
+                              <span className="pill pill-hit">
                                 {c.hits}/{c.total} · #{c.best}
                               </span>
                             )}
@@ -292,10 +273,38 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
                 </tbody>
               </table>
             </div>
-          </section>
+          </Card>
         </>
       )}
     </main>
+  );
+}
+
+function Stat({ icon, label, value, hero, children }: { icon: IconName; label: string; value: string; hero?: boolean; children: ReactNode }) {
+  return (
+    <div className={`card stat${hero ? " stat-hero" : ""}`}>
+      <div className="stat-top">
+        <span className="stat-label">{label}</span>
+        <span className="icon-chip"><Icon name={icon} size={16} /></span>
+      </div>
+      <div className="stat-value">{value}</div>
+      <div className="stat-sub">{children}</div>
+    </div>
+  );
+}
+
+function Card({ id, icon, title, note, children }: { id: string; icon: IconName; title: string; note: string; children: ReactNode }) {
+  return (
+    <section id={id} className="card panel">
+      <div className="panel-head">
+        <span className="icon-chip"><Icon name={icon} size={16} /></span>
+        <div>
+          <h2>{title}</h2>
+          <p className="note">{note}</p>
+        </div>
+      </div>
+      <div className="panel-body">{children}</div>
+    </section>
   );
 }
 
