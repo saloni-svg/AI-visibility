@@ -157,3 +157,55 @@ code { font-size: 13px; background: var(--wash); padding: 1px 5px; border-radius
 @media (max-width: 560px) {
   .bar-row { grid-template-columns: 1fr; gap: 6px; }
 }
+
+/* App shell: side panel on the left, dashboard on the right. */
+.app-shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }
+.sidebar {
+  position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 24px;
+  padding: 24px 16px; background: var(--surface); border-right: 1px solid var(--border);
+}
+.sidebar-mark { font-weight: 600; font-size: 16px; padding: 0 8px; }
+.sidebar-heading { color: var(--text-muted); font-size: 12px; margin: 0 0 6px; padding: 0 8px; }
+.sidebar nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.sidebar nav a { display: block; padding: 6px 8px; border-radius: 6px; text-decoration: none; color: var(--text-secondary); }
+.sidebar nav a:hover, .sidebar nav a:focus-visible { background: var(--wash); color: var(--text-primary); }
+.sidebar-account { margin-top: auto; border-top: 1px solid var(--border); padding-top: 16px; }
+.sidebar-email { margin: 0 0 12px; padding: 0 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-account form { padding: 0 8px; }
+section[id] { scroll-margin-top: 16px; }
+
+/* Buttons and auth pages */
+.btn-primary, .btn-secondary {
+  font: inherit; border-radius: 8px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--border);
+}
+.btn-primary { background: var(--text-primary); color: var(--surface); border-color: transparent; font-weight: 600; width: 100%; }
+.btn-primary:disabled { opacity: 0.6; cursor: default; }
+.btn-secondary { background: transparent; color: var(--text-primary); width: 100%; }
+.btn-secondary:hover { background: var(--wash); }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 32px 16px; max-width: none; }
+.auth-card { width: 100%; max-width: 400px; padding: 32px; }
+.auth-mark { color: var(--text-secondary); font-weight: 600; margin-bottom: 16px; }
+.auth-form { display: grid; gap: 14px; margin-top: 20px; }
+.auth-form label { display: grid; gap: 6px; color: var(--text-secondary); font-size: 13px; }
+.auth-form input {
+  font: inherit; color: var(--text-primary); background: var(--page);
+  border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+}
+.auth-form input:focus { outline: 2px solid var(--openai); outline-offset: 1px; }
+.auth-error { color: var(--bad); margin: 0; font-size: 13px; }
+.auth-message { margin: 20px 0 0; padding: 12px; border-radius: 8px; background: var(--wash); }
+.auth-switch { margin-top: 20px; text-align: center; }
+
+/* Narrow screens: the side panel becomes a bar across the top. */
+@media (max-width: 860px) {
+  .app-shell { grid-template-columns: minmax(0, 1fr); }
+  .sidebar { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--border); }
+  .sidebar nav { order: 3; width: 100%; overflow-x: auto; }
+  .sidebar nav ul { display: flex; gap: 4px; }
+  .sidebar nav a { white-space: nowrap; }
+  .sidebar .sidebar-heading { display: none; }
+  .sidebar-account { margin: 0 0 0 auto; border: 0; padding: 0; display: flex; align-items: center; gap: 8px; }
+  .sidebar-email { display: none; }
+  .sidebar-account form { padding: 0; }
+  .sidebar-account .btn-secondary { width: auto; padding: 6px 12px; }
+}

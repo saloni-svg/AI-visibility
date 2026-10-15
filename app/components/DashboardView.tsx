@@ -53,7 +53,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
         </div>
       ) : (
         <>
-          <section className="grid kpis" aria-label="Summary">
+          <section id="overview" className="grid kpis" aria-label="Summary">
             <div className="card tile-hero">
               <div className="tile-label">Mentioned in</div>
               <div className="tile-value">{pct(rateNow)}</div>
@@ -86,7 +86,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
             </div>
           </section>
 
-          <section className="card" style={{ marginTop: 16 }}>
+          <section id="competitors" className="card" style={{ marginTop: 16 }}>
             <div className="card-head">
               <h2>Mention rate: you vs competitors</h2>
               <p className="note">Share of {scopeLabel} answers from each AI tool that name the brand.</p>
@@ -128,7 +128,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
             )}
           </section>
 
-          <section className="card" style={{ marginTop: 16 }}>
+          <section id="trend" className="card" style={{ marginTop: 16 }}>
             <div className="card-head">
               <h2>Your mention rate over time</h2>
               <p className="note">{brand.name}&apos;s mention rate in {scopeLabel} answers, per run.</p>
@@ -154,7 +154,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
           </section>
 
           <div className="grid two">
-            <section className="card">
+            <section id="recommended" className="card">
               <div className="card-head">
                 <h2>Who AI recommends</h2>
                 <p className="note">Every brand named in these answers, by how many answers name it.</p>
@@ -198,7 +198,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
               </HoverTips>
             </section>
 
-            <section className="card">
+            <section id="sources" className="card">
               <div className="card-head">
                 <h2>Most-cited websites</h2>
                 <p className="note">Sites the AIs used as sources. Being featured on these helps you get mentioned.</p>
@@ -244,7 +244,7 @@ export default function DashboardView({ data }: { data: Extract<Dashboard, { sta
             </section>
           </div>
 
-          <section className="card" style={{ marginTop: 16 }}>
+          <section id="questions" className="card" style={{ marginTop: 16 }}>
             <div className="card-head">
               <h2>Question by question</h2>
               <p className="note">

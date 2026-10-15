@@ -1,10 +1,16 @@
 import { loadDashboard, type Dashboard, type Scope } from "@/lib/dashboard";
-import DashboardView, { SCOPES } from "./components/DashboardView";
+import { redirect } from "next/navigation";
+import { currentUser } from "@/lib/auth";
+import DashboardView, { SCOPES } from "../components/DashboardView";
 
 // Always read fresh data from Supabase; nothing here is cached at build time.
 export const dynamic = "force-dynamic";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ run?: string; type?: string }> }) {
+  // proxy.ts already redirects signed-out visitors; check again here so the
+  // data is never loaded without a signed-in user.
+  if (!(await currentUser())) redirect("/login");
+
   const params = await searchParams;
   const scope: Scope = SCOPES.some((s) => s.value === params.type) ? (params.type as Scope) : "all";
 

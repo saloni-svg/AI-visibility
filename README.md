@@ -79,6 +79,12 @@ npm run dev
 
 Open http://localhost:3000. It reads straight from Supabase, so reload after each `npm run track`.
 
+**Accounts.** The dashboard needs a login. Create one at http://localhost:3000/signup, then sign in at `/login`. The side panel on the left jumps to each section and has a **Log out** button at the bottom.
+
+- Add `SUPABASE_PUBLISHABLE_KEY` to `.env` (Supabase → Project Settings → API Keys → Publishable key).
+- Supabase emails a confirmation link after sign-up. In Supabase → Authentication → URL Configuration, make sure **Site URL** is `http://localhost:3000` and add `http://localhost:3000/**` under **Redirect URLs**. To skip the email while testing, turn off **Confirm email** under Authentication → Sign In / Providers → Email.
+- Anyone who can open the dashboard can sign up. Once your team has accounts, you can turn off **Allow new users to sign up** in the same settings.
+
 - **Filters:** pick a run, and show all questions, only unbranded or only branded ones. Everything on the page follows the filters.
 - **Summary:** how often you're mentioned (with the change since the previous run), your average position, how often your own website is cited, and how many answers were analysed.
 - **You vs competitors:** mention rate per AI tool for you and each competitor.
@@ -87,7 +93,7 @@ Open http://localhost:3000. It reads straight from Supabase, so reload after eac
 - **Most-cited websites:** the sources the AIs rely on.
 - **Question by question:** for each prompt and AI tool, how many tries mentioned you and your best position.
 
-The dashboard uses the service role key on the server only; it is never sent to the browser. It has no login, so run it locally. Don't deploy it publicly until we add authentication.
+The dashboard uses the service role key on the server only; it is never sent to the browser.
 
 ## Settings (optional, in `.env`)
 
@@ -112,8 +118,12 @@ lib/env.ts                          loads .env and the settings above
 scripts/track.ts                    main script: ask, save, parse
 scripts/parse.ts                    re-run the parser on saved answers
 lib/dashboard.ts                    loads and summarises the data for the dashboard
-app/page.tsx                        dashboard page (loads the data)
-app/components/                     dashboard view, tooltips, run picker, trend chart
+app/(dashboard)/                    dashboard page and the layout with the side panel
+app/(auth)/                         sign-in and sign-up pages, and the login/logout actions
+app/auth/callback/                  handles the link in the sign-up confirmation email
+app/components/                     dashboard view, side panel, auth form, tooltips, charts
+lib/auth.ts                         Supabase Auth helpers
+proxy.ts                            sends signed-out visitors to the sign-in page
 ```
 
 ## Notes
