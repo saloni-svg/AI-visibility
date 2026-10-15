@@ -87,7 +87,17 @@ Open http://localhost:3000. It reads straight from Supabase, so reload after eac
 - **Most-cited websites:** the sources the AIs rely on.
 - **Question by question:** for each prompt and AI tool, how many tries mentioned you and your best position.
 
-The dashboard uses the service role key on the server only; it is never sent to the browser. It has no login, so run it locally. Don't deploy it publicly until we add authentication.
+The dashboard uses the service role key on the server only; it is never sent to the browser.
+
+### Putting the dashboard on Vercel
+
+1. On vercel.com, click **Add New → Project** and import this GitHub repository. Vercel detects Next.js automatically.
+2. Under **Environment Variables**, add `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` and `DASHBOARD_PASSWORD` (pick a strong password). The AI keys aren't needed: the dashboard only reads from Supabase.
+3. Click **Deploy**. Opening the site asks for a login: type anything as the username and `DASHBOARD_PASSWORD` as the password.
+
+Without `DASHBOARD_PASSWORD` the Vercel site stays locked. Locally, no password is asked unless you set one in `.env`.
+
+Vercel only hosts the dashboard. Keep running `npm run track` on your computer; the dashboard shows new runs as soon as you reload it.
 
 ## Settings (optional, in `.env`)
 
