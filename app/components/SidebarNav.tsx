@@ -1,47 +1,61 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Icon, { type IconName } from "./Icon";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 
-const SECTIONS: { id: string; label: string; icon: IconName }[] = [
-  { id: "overview", label: "Overview", icon: "grid" },
-  { id: "competitors", label: "You vs competitors", icon: "users" },
-  { id: "trend", label: "Over time", icon: "trend" },
-  { id: "recommended", label: "Who AI recommends", icon: "sparkles" },
-  { id: "sources", label: "Cited websites", icon: "globe" },
-  { id: "questions", label: "Question by question", icon: "list" },
+export type Item = { label: string; href?: (domain: string) => string; match?: string; always?: boolean };
+export const GROUPS: { title: string; items: Item[] }[] = [
+  {
+    title: "AI Analysis",
+    items: [
+      { label: "Visibility overview", href: (d) => `/?domain=${d}`, match: "/" },
+      { label: "Competitor research", href: (d) => `/competitors?domain=${d}`, match: "/competitors" },
+      { label: "Change explainer", href: (d) => `/changes?domain=${d}`, match: "/changes" },
+      { label: "Prompt research", href: (d) => (d ? `/prompts?domain=${d}` : "/prompts"), match: "/prompts", always: true },
+    ],
+  },
+  { title: "Keyword Research", items: [{ label: "Keyword overview", href: (d) => (d ? `/keywords?domain=${d}` : "/keywords"), match: "/keywords", always: true }] },
+  { title: "Brand Performance", items: [{ label: "Brand performance" }, { label: "Perception" }, { label: "Narrative drivers" }, { label: "Questions" }] },
+  {
+    title: "Boost & Monitor",
+    items: [
+      { label: "Content agent", href: (d) => `/agent?domain=${d}`, match: "/agent" },
+      { label: "Page fixes", href: (d) => `/fixes?domain=${d}`, match: "/fixes" },
+      { label: "Position tracking", href: (d) => `/positions?domain=${d}`, match: "/positions" },
+      { label: "Site audit", href: () => "/audit", match: "/audit", always: true },
+      { label: "Review management", href: (d) => `/reviews?domain=${d}`, match: "/reviews" },
+      { label: "Prompt tracking", href: () => "/tracking", match: "/tracking", always: true },
+    ],
+  },
 ];
 
-// Section links that highlight whichever section is currently on screen.
+// Section links for the chosen domain. Items without a page yet show "Soon".
 export default function SidebarNav() {
-  const [active, setActive] = useState("overview");
-
-  useEffect(() => {
-    const els = SECTIONS.map((s) => document.getElementById(s.id)).filter((el): el is HTMLElement => !!el);
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-10% 0px -60% 0px" },
-    );
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+  const path = usePathname();
+  const domain = useSearchParams().get("domain");
 
   return (
-    <nav aria-label="Dashboard sections" className="side-nav">
-      <p className="side-heading">Dashboard</p>
-      <ul>
-        {SECTIONS.map((s) => (
-          <li key={s.id}>
-            <a href={`#${s.id}`} aria-current={active === s.id ? "location" : undefined} onClick={() => setActive(s.id)}>
-              <Icon name={s.icon} size={17} />
-              <span>{s.label}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav aria-label="Main" className="side-nav">
+      <Link href="/" className={`side-new${path === "/" && !domain ? " is-active" : ""}`}>+ New analysis</Link>
+      {GROUPS.map((g) => (
+        <div key={g.title} className="side-group">
+          <p className="side-heading">{g.title}</p>
+          <ul>
+            {g.items.map((item) => (
+              <li key={item.label}>
+                {item.href && (domain || item.always) ? (
+                  <Link href={item.href(domain ?? "")} aria-current={path === item.match || (item.always && path.startsWith(item.match ?? "-")) ? "page" : undefined}>{item.label}</Link>
+                ) : (
+                  <span className="side-disabled" title={item.href ? "Analyze a domain first" : "Coming soon"}>
+                    {item.label}
+                    {!item.href && <span className="soon">Soon</span>}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </nav>
   );
 }

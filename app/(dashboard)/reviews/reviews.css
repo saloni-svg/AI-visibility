@@ -1,0 +1,79 @@
+/* Review management page. */
+.rv-g { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--border); flex: none; }
+.rv-connect { padding: 22px; display: grid; gap: 18px; }
+.rv-connect-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.rv-connect-head > div { flex: 1; min-width: 240px; }
+.rv-connect-head h2 { font-size: 18px; margin: 0 0 4px; }
+.rv-connect-head .note { margin: 0; }
+.rv-connect-head .btn-primary { height: 44px; padding: 0 20px; margin: 0; }
+.rv-pick-title { margin: 0 0 8px; font-weight: 600; }
+.rv-pick ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.rv-pick li { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; }
+.rv-pick li .note { margin: 2px 0 0; }
+.rv-pick-name { margin: 0; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rv-pick-rating { margin: 4px 0 0; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.rv-search { margin-top: 14px; display: grid; gap: 6px; }
+.rv-search > div { display: flex; gap: 8px; }
+.rv-search input, .rv-draft textarea { font: inherit; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-primary); }
+.rv-search input { flex: 1; height: 36px; padding: 0 12px; }
+.rv-stars { color: var(--grid); letter-spacing: 1px; line-height: 1; }
+.rv-stars .on { color: #f4b400; }
+.rv-listing { padding: 18px 20px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.rv-listing-main { flex: 1; min-width: 220px; }
+.rv-listing-main h2 { margin: 0; font-size: 18px; }
+.rv-listing-main .note { margin: 2px 0 0; }
+.rv-listing-main a { color: var(--accent); text-decoration: none; }
+.rv-listing-actions { display: flex; gap: 12px; align-items: center; }
+.rv-progress { padding: 16px 20px; display: grid; gap: 8px; }
+.rv-progress .note { margin: 0; }
+.rv-indeterminate { width: 35% !important; animation: rv-slide 1.4s ease-in-out infinite; }
+@keyframes rv-slide { from { margin-left: -35%; } to { margin-left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .rv-indeterminate { animation: none; width: 100% !important; opacity: 0.4; } }
+.rv-summary { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr) minmax(200px, 1fr); gap: 16px; }
+.rv-score { padding: 20px; display: grid; justify-items: center; align-content: center; gap: 8px; }
+.rv-big { font-size: 44px; font-weight: 700; line-height: 1; }
+.rv-score .note { margin: 0; }
+.rv-dist { padding: 16px 20px; display: grid; gap: 6px; }
+.rv-dist .note { margin: 4px 0 0; font-size: 12.5px; }
+.rv-dist-row { font: inherit; display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; gap: 10px; align-items: center; border: 0; background: none; color: var(--text-primary); cursor: pointer; padding: 3px 0; text-align: left; }
+.rv-dist-row b { text-align: right; }
+.rv-dist-row:hover { opacity: 0.8; }
+.rv-kpis { padding: 18px 20px; display: grid; gap: 12px; align-content: center; }
+.rv-kpis > div { display: flex; align-items: baseline; gap: 10px; }
+.rv-kpis .note { margin: 0; }
+.rv-kpi { font-size: 24px; font-weight: 700; min-width: 54px; }
+.rv-toolbar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px; border-bottom: 1px solid var(--grid); }
+.rv-toolbar-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.rv-list { list-style: none; margin: 0; padding: 0; }
+.rv-item { padding: 18px 20px; border-top: 1px solid var(--grid); display: grid; gap: 10px; }
+.rv-item:first-child { border-top: 0; }
+.rv-head { display: flex; gap: 12px; align-items: center; }
+.rv-head > div { flex: 1; min-width: 0; }
+.rv-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex: none; }
+.rv-initial { display: grid; place-items: center; background: var(--select-bg); color: var(--accent); font-weight: 700; text-transform: uppercase; }
+.rv-author { margin: 0; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.rv-author a { color: var(--text-primary); text-decoration: none; }
+.rv-guide { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #fef3e0; color: #b05a00; }
+.rv-meta { margin: 2px 0 0; display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--text-secondary); }
+.rv-tag { flex: none; }
+.rv-text { margin: 0; white-space: pre-wrap; line-height: 1.6; }
+.rv-reply { margin-left: 52px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 8px 8px 0; }
+.rv-reply p { margin: 0; }
+.rv-reply-label { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); display: block; }
+.rv-draft { margin-left: 52px; display: grid; gap: 8px; }
+.rv-draft textarea { padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.rv-draft > .btn-secondary { justify-self: start; }
+@media (max-width: 1000px) { .rv-summary { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .rv-reply, .rv-draft { margin-left: 0; } .rv-pick li { flex-direction: column; align-items: stretch; } }
+
+/* v4: rating summary in a sticky left column, reviews on the right */
+.rv-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; }
+.rv-layout .rv-summary { grid-template-columns: minmax(0, 1fr); position: sticky; top: 120px; gap: 12px; }
+.rv-listing { background: var(--surface-2); border: 0; }
+.rv-score { border: 0; background: var(--surface-2); }
+@media (max-width: 1100px) {
+  .rv-layout { grid-template-columns: minmax(0, 1fr); }
+  .rv-layout .rv-summary { position: static; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
+.rv-reply-text { white-space: pre-wrap; }
+.rv-hint { margin: 0; padding: 8px 12px; background: var(--good-soft); color: var(--text-primary); border-radius: 6px; }

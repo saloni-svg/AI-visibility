@@ -18,7 +18,17 @@ export function envInt(name: string, fallback: number): number {
 
 export const config = {
   attemptsPerPrompt: envInt("ATTEMPTS_PER_PROMPT", 3),
+  // Website analyses (Analyze button): fewer attempts keeps on-demand checks cheap.
+  webAttemptsPerPrompt: envInt("WEB_ATTEMPTS_PER_PROMPT", 1),
+  // How many prompt x provider calls each progress step makes.
+  webBatchSize: envInt("WEB_BATCH_SIZE", 12),
+  // Calls in flight at once during a website check.
+  webConcurrency: envInt("WEB_CONCURRENCY", 8),
+  // Reuse a brand's results if it was checked within this many days.
+  reuseResultsDays: envInt("REUSE_RESULTS_DAYS", 7),
   concurrency: envInt("CONCURRENCY", 4),
+  // Content agent: maximum model turns per run (each turn can call several tools).
+  agentMaxSteps: envInt("AGENT_MAX_STEPS", 14),
   // Agent API preset: fast | low | medium | high | xhigh (deeper = slower and pricier)
   perplexityPreset: process.env.PERPLEXITY_PRESET || "fast",
   models: {
@@ -27,5 +37,7 @@ export const config = {
     // Optional: a provider/model ID such as "openai/gpt-5.6-sol". Unset = use the preset.
     perplexity: process.env.PERPLEXITY_MODEL || undefined,
     parser: process.env.PARSER_MODEL || "gpt-4.1-mini",
+    // The content agent plans and writes, so it uses a stronger model.
+    agent: process.env.AGENT_MODEL || "gpt-4.1",
   },
 };

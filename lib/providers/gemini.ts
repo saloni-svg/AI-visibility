@@ -1,5 +1,6 @@
 import { config, requireEnv } from "../env";
 import { postJson } from "../http";
+import { askedFrom } from "./location";
 import type { Citation, Provider } from "./types";
 
 // Uses Google Search grounding so the answer includes its web sources.
@@ -7,15 +8,16 @@ import type { Citation, Provider } from "./types";
 // and puts the real site domain in the title.
 export const gemini: Provider = {
   name: "gemini",
+  label: "Gemini",
   model: config.models.gemini,
-  apiKeyEnv: "GEMINI_API_KEY",
+  requiredEnv: ["GEMINI_API_KEY"],
 
-  call(prompt) {
+  call(prompt, country) {
     return postJson(
       `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent`,
       { "x-goog-api-key": requireEnv("GEMINI_API_KEY") },
       {
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        contents: [{ role: "user", parts: [{ text: askedFrom(prompt, country) }] }],
         tools: [{ google_search: {} }],
       },
     );

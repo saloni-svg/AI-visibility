@@ -74,9 +74,9 @@ export async function extractWithModel(answerText: string, knownNames: string[])
 type Entity = { id: string; name: string; domain: string | null; aliases: string[] };
 type BrandContext = { brand: Entity; competitors: Entity[] };
 
-const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+export const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-function matches(name: string, entity: Entity): boolean {
+export function matches(name: string, entity: Pick<Entity, "name" | "domain" | "aliases">): boolean {
   const n = normalize(name);
   const candidates = [entity.name, ...entity.aliases];
   if (entity.domain) candidates.push(entity.domain, entity.domain.split(".")[0]);
@@ -107,6 +107,12 @@ type AnswerRow = {
 };
 
 async function parseOne(answer: AnswerRow, ctx: BrandContext) {
+  // Searches with no Google AI Overview have empty text: nothing to extract.
+  if (!answer.answer_text.trim()) {
+    const { error } = await db().from("answers").update({ parsed_at: new Date().toISOString() }).eq("id", answer.id);
+    if (error) throw error;
+    return { mentions: 0, sources: 0 };
+  }
   const knownNames = [ctx.brand.name, ...ctx.competitors.map((c) => c.name)];
   const parsed = await extractWithModel(answer.answer_text, knownNames);
 

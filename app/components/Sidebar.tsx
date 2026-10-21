@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { signOut } from "../(auth)/actions";
 import Icon from "./Icon";
 import SidebarNav from "./SidebarNav";
@@ -14,7 +15,9 @@ export default function Sidebar({ email }: { email: string }) {
           <div className="brand-tag">Brand monitor</div>
         </div>
       </div>
-      <SidebarNav />
+      <Suspense fallback={<nav className="side-nav" aria-label="Main" />}>
+        <SidebarNav />
+      </Suspense>
       <div className="account">
         <span className="avatar" aria-hidden="true">{initials}</span>
         <div className="account-text">

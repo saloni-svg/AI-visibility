@@ -11,7 +11,8 @@ const pct = (v: number) => `${Math.round(v * 100)}%`;
 
 // Line chart of mention rate (0-100%) per run, one 2px line per AI tool, with a
 // crosshair that snaps to the nearest run and lists every tool's value.
-export default function TrendChart({ series, points }: { series: Series[]; points: Point[] }) {
+// unit "count" scales the y axis to the largest value instead of 0-100%.
+export default function TrendChart({ series, points, unit = "percent" }: { series: Series[]; points: Point[]; unit?: "percent" | "count" }) {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(640);
   const [hover, setHover] = useState<number | null>(null);
@@ -27,7 +28,11 @@ export default function TrendChart({ series, points }: { series: Series[]; point
   const plotW = width - PAD.left - PAD.right;
   const plotH = HEIGHT - PAD.top - PAD.bottom;
   const x = (i: number) => PAD.left + (points.length === 1 ? plotW / 2 : (i / (points.length - 1)) * plotW);
-  const y = (v: number) => PAD.top + (1 - v) * plotH;
+  const peak = Math.max(0, ...points.flatMap((p) => series.map((s) => p.byProvider[s.key] ?? 0)));
+  const step = unit === "count" ? Math.max(1, Math.ceil(peak / 4)) : 0.25;
+  const top = unit === "count" ? step * 4 : 1;
+  const fmt = (v: number) => (unit === "count" ? String(Math.round(v)) : pct(v));
+  const y = (v: number) => PAD.top + (1 - v / top) * plotH;
 
   // Show at most ~6 x-axis labels so they never collide.
   const labelEvery = Math.max(1, Math.ceil(points.length / Math.max(2, Math.floor(plotW / 110))));
@@ -48,15 +53,15 @@ export default function TrendChart({ series, points }: { series: Series[]; point
         width={width}
         height={HEIGHT}
         role="img"
-        aria-label="Mention rate per run for each AI tool"
+        aria-label={unit === "count" ? "Counts per run" : "Mention rate per run"}
         onPointerMove={onMove}
         onPointerLeave={() => setHover(null)}
       >
-        {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+        {[0, 1, 2, 3, 4].map((i) => i * step).map((t) => (
           <g key={t}>
             <line x1={PAD.left} x2={width - PAD.right} y1={y(t)} y2={y(t)} stroke={t === 0 ? "var(--baseline)" : "var(--grid)"} strokeWidth={1} />
             <text className="axis-text" x={PAD.left - 8} y={y(t) + 4} textAnchor="end">
-              {pct(t)}
+              {fmt(t)}
             </text>
           </g>
         ))}
@@ -106,7 +111,7 @@ export default function TrendChart({ series, points }: { series: Series[]; point
             return (
               <div className="tip-row" key={s.key}>
                 <span className="key-line" style={{ background: s.color }} />
-                <strong style={{ fontSize: 14 }}>{v === undefined ? "–" : pct(v)}</strong>
+                <strong style={{ fontSize: 14 }}>{v === undefined ? "–" : fmt(v)}</strong>
                 <span className="tip-label">{s.label}</span>
               </div>
             );

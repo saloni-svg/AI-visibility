@@ -4,14 +4,23 @@ export async function postJson(
   headers: Record<string, string>,
   body: unknown,
   retries = 3,
+  timeoutMs = 120_000,
 ): Promise<any> {
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(120_000),
-    });
+    let res: Response;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch (err) {
+      // Network error ("fetch failed") or timeout: retry like a server error.
+      if (attempt >= retries) throw new Error(`Couldn't reach ${new URL(url).host}: ${(err as Error).message}`);
+      await new Promise((r) => setTimeout(r, 2 ** attempt * 2000));
+      continue;
+    }
     if (res.ok) return res.json();
 
     const text = await res.text();

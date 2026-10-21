@@ -1,5 +1,6 @@
 import Perplexity from "@perplexity-ai/perplexity_ai";
 import { config, requireEnv } from "../env";
+import { askedFrom } from "./location";
 import type { Citation, Provider } from "./types";
 
 // Uses the Perplexity Agent API (POST /v1/agent). By default it runs a preset,
@@ -11,15 +12,17 @@ let client: Perplexity | undefined;
 
 export const perplexity: Provider = {
   name: "perplexity",
+  label: "Perplexity",
   model: config.models.perplexity ?? `preset:${config.perplexityPreset}`,
-  apiKeyEnv: "PERPLEXITY_API_KEY",
+  requiredEnv: ["PERPLEXITY_API_KEY"],
 
-  async call(prompt) {
+  async call(prompt, country) {
+    const input = askedFrom(prompt, country);
     client ??= new Perplexity({ apiKey: requireEnv("PERPLEXITY_API_KEY") });
     const response = await client.responses.create(
       config.models.perplexity
-        ? { model: config.models.perplexity, input: prompt, tools: [{ type: "web_search" }] }
-        : { preset: config.perplexityPreset, input: prompt },
+        ? { model: config.models.perplexity, input, tools: [{ type: "web_search" }] }
+        : { preset: config.perplexityPreset, input },
     );
     if (response.status !== "completed") {
       throw new Error(`Perplexity response ${response.status}: ${response.error?.message ?? "no answer"}`);

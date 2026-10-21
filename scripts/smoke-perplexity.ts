@@ -12,7 +12,7 @@ if (!process.env.PERPLEXITY_API_KEY) {
 }
 
 try {
-  const raw = await perplexity.call("What is Perplexity AI? Answer in one sentence.");
+  const raw = await perplexity.call("What is Perplexity AI? Answer in one sentence.", "US");
   const { text, citations } = perplexity.extract(raw);
   console.log("HTTP 200");
   console.log({

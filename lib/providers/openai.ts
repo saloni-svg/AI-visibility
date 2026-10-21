@@ -1,19 +1,26 @@
 import { config, requireEnv } from "../env";
 import { postJson } from "../http";
+import { isCountry } from "../countries";
 import type { Citation, Provider } from "./types";
 
 // Uses the Responses API with web search on, so answers match what ChatGPT
 // users see and include cited URLs.
 export const openai: Provider = {
   name: "openai",
+  label: "ChatGPT",
   model: config.models.openai,
-  apiKeyEnv: "OPENAI_API_KEY",
+  requiredEnv: ["OPENAI_API_KEY"],
 
-  call(prompt) {
+  // Web search runs as if the user is in `country`.
+  call(prompt, country) {
     return postJson(
       "https://api.openai.com/v1/responses",
       { Authorization: `Bearer ${requireEnv("OPENAI_API_KEY")}` },
-      { model: this.model, input: prompt, tools: [{ type: "web_search" }] },
+      {
+        model: this.model,
+        input: prompt,
+        tools: [{ type: "web_search", ...(isCountry(country) ? { user_location: { type: "approximate", country } } : {}) }],
+      },
     );
   },
 

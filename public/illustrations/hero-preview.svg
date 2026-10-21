@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400">
+<defs><filter id="s" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#3b2f9e" flood-opacity="0.13"/></filter>
+<linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#0f6e5e"/><stop offset="1" stop-color="#2fb896"/></linearGradient>
+<linearGradient id="a" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7b6cf6" stop-opacity=".25"/><stop offset="1" stop-color="#7b6cf6" stop-opacity="0"/></linearGradient></defs>
+<rect x="30" y="50" width="280" height="250" rx="16" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="54" y="86" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#14161c" text-anchor="start">AI visibility</text>
+<path d="M80 230 A90 90 0 0 1 260 230" fill="none" stroke="#eceef3" stroke-width="16" stroke-linecap="round"/><path d="M80 230 A90 90 0 0 1 203.1 146.3" fill="none" stroke="url(#g)" stroke-width="16" stroke-linecap="round"/><text x="170" y="208" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="34" font-weight="700" fill="#14161c" text-anchor="middle">62</text><text x="170" y="232" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#6d5ce6" text-anchor="middle">Medium</text>
+<text x="170" y="276" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#8a8f98" text-anchor="middle">vs 4 competitors</text>
+<rect x="330" y="20" width="400" height="280" rx="16" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="354" y="56" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#14161c" text-anchor="start">Mentions</text>
+<circle cx="460" cy="51" r="5" fill="#1f9e80"/>
+<text x="470" y="56" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">You</text>
+<circle cx="552" cy="51" r="5" fill="#0f8f7a"/>
+<text x="562" y="56" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">Competitor A</text>
+<circle cx="644" cy="51" r="5" fill="#c47f0a"/>
+<text x="654" y="56" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">Competitor B</text>
+<line x1="354" x2="706" y1="100" y2="100" stroke="#eef0f4"/>
+<line x1="354" x2="706" y1="150" y2="150" stroke="#eef0f4"/>
+<line x1="354" x2="706" y1="200" y2="200" stroke="#eef0f4"/>
+<line x1="354" x2="706" y1="250" y2="250" stroke="#eef0f4"/>
+<polygon points="354,230 410,220 470,205 530,180 590,160 650,130 706,105 706,252 354,252" fill="url(#a)"/>
+<polyline points="354,230 410,220 470,205 530,180 590,160 650,130 706,105" fill="none" stroke="#1f9e80" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="354,150 410,160 470,150 530,165 590,170 650,175 706,180" fill="none" stroke="#0f8f7a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="354,200 410,190 470,205 530,215 590,210 650,222 706,228" fill="none" stroke="#c47f0a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="706" cy="105" r="6" fill="#1f9e80" stroke="#fff" stroke-width="3"/>
+<rect x="618" y="72" width="86" height="24" rx="12" fill="#e7f5ee"/>
+<text x="661" y="89" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#067a3a" text-anchor="middle">+38% ↑</text>
+<text x="380" y="282" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#8a8f98" text-anchor="start">Aug</text>
+<text x="530" y="282" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#8a8f98" text-anchor="start">Sep</text>
+<text x="680" y="282" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="500" fill="#8a8f98" text-anchor="start">Oct</text>
+<rect x="750" y="60" width="220" height="240" rx="16" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="774" y="96" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="650" fill="#14161c" text-anchor="start">Share of voice</text>
+<text x="774" y="128" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">You</text>
+<text x="946" y="128" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#14161c" text-anchor="end">42%</text>
+<rect x="774" y="136" width="172" height="8" rx="4" fill="#eef0f4"/><rect x="774" y="136" width="163" height="8" rx="4" fill="#1f9e80"/>
+<text x="774" y="168" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">Comp. A</text>
+<text x="946" y="168" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#14161c" text-anchor="end">27%</text>
+<rect x="774" y="176" width="172" height="8" rx="4" fill="#eef0f4"/><rect x="774" y="176" width="105" height="8" rx="4" fill="#0f8f7a"/>
+<text x="774" y="208" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">Comp. B</text>
+<text x="946" y="208" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#14161c" text-anchor="end">19%</text>
+<rect x="774" y="216" width="172" height="8" rx="4" fill="#eef0f4"/><rect x="774" y="216" width="74" height="8" rx="4" fill="#c47f0a"/>
+<text x="774" y="248" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="500" fill="#4b4f58" text-anchor="start">Comp. C</text>
+<text x="946" y="248" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#14161c" text-anchor="end">12%</text>
+<rect x="774" y="256" width="172" height="8" rx="4" fill="#eef0f4"/><rect x="774" y="256" width="47" height="8" rx="4" fill="#cf3f6c"/>
+<rect x="70" y="326" width="210" height="44" rx="22" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="88" y="353" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#14161c" text-anchor="start">ChatGPT</text>
+<rect x="168" y="337" width="102" height="22" rx="11" fill="#e7f5ee"/>
+<text x="219.0" y="352" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#067a3a" text-anchor="middle">Mentioned #2</text>
+<rect x="300" y="326" width="240" height="44" rx="22" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="318" y="353" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#14161c" text-anchor="start">Google AI Overview</text>
+<rect x="477" y="337" width="53" height="22" rx="11" fill="#eef1ff"/>
+<text x="503.5" y="352" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#0f6e5e" text-anchor="middle">Cited</text>
+<rect x="560" y="326" width="190" height="44" rx="22" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="578" y="353" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#14161c" text-anchor="start">Gemini</text>
+<rect x="631" y="337" width="109" height="22" rx="11" fill="#fdeceb"/>
+<text x="685.5" y="352" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#c92a2a" text-anchor="middle">Not mentioned</text>
+<rect x="770" y="326" width="200" height="44" rx="22" fill="#fff" stroke="#e6e8ee" filter="url(#s)"/>
+<text x="788" y="353" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#14161c" text-anchor="start">Perplexity</text>
+<rect x="858" y="337" width="102" height="22" rx="11" fill="#e7f5ee"/>
+<text x="909.0" y="352" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#067a3a" text-anchor="middle">Mentioned #1</text>
+</svg>

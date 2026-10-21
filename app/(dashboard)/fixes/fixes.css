@@ -1,0 +1,55 @@
+/* Page fixes page. Its own file, so browsers always load the latest version. */
+.rag-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.rag-step { padding: 20px; display: flex; gap: 14px; align-items: flex-start; }
+.rag-step .step-num { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: linear-gradient(135deg, #0f6e5e, #2fb896); }
+.rag-step-body { display: grid; gap: 10px; justify-items: start; min-width: 0; flex: 1; }
+.rag-step-body h2 { font-size: 16px; margin: 4px 0 0; }
+.rag-step-body .note { margin: 0; }
+.rag-step-body .btn-primary, .rag-step-body .btn-secondary { height: 40px; padding: 0 16px; margin: 0; }
+.rag-stats { margin: 0; font-size: 13.5px; color: var(--text-secondary); }
+.rag-stats b { color: var(--text-primary); }
+.rag-search { grid-column: 1 / -1; padding: 20px; display: grid; gap: 10px; }
+.rag-search h2 { font-size: 16px; }
+.rag-search > .note { margin: 0; }
+.rag-search-form { display: flex; gap: 10px; }
+.rag-search-form input { flex: 1; min-width: 0; font: inherit; height: 42px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-primary); }
+.rag-search-form input:focus { outline: none; border-color: var(--select-line); box-shadow: 0 0 0 3px var(--select-bg); }
+.rag-search-form .btn-secondary { height: 42px; }
+.rag-matches { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 10px; }
+.rag-matches li { padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); display: grid; gap: 4px; }
+.rag-match-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; overflow-wrap: anywhere; }
+.rag-match-heading { margin: 0; font-weight: 600; font-size: 13.5px; }
+.rag-match-text { margin: 0; color: var(--text-secondary); font-size: 13.5px; line-height: 1.55; }
+.rag-error { grid-column: 1 / -1; margin: 0; }
+
+.fix-page { border-top: 1px solid var(--grid); }
+.fix-page-url { display: flex; justify-content: space-between; gap: 10px; margin: 0; padding: 14px 20px; font-size: 14.5px; background: var(--surface-2); overflow-wrap: anywhere; }
+.fix-page-url .muted { font-weight: 400; font-size: 13px; flex: none; }
+.fix { padding: 16px 20px; display: grid; gap: 10px; border-top: 1px solid var(--grid); }
+.fix-question { margin: 0; font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fix-reason { margin: 0; color: var(--text-secondary); }
+.fix-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.fix-before, .fix-after { border-radius: 10px; padding: 12px 14px; display: grid; gap: 6px; align-content: start; }
+.fix-before { background: var(--bad-soft); border: 1px solid color-mix(in srgb, var(--bad) 22%, transparent); }
+.fix-after { background: var(--good-soft); border: 1px solid color-mix(in srgb, var(--good) 22%, transparent); }
+.fix-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+.fix-before p, .fix-after p { margin: 0; white-space: pre-wrap; line-height: 1.6; font-size: 14px; }
+.fix-match { margin: 0 0 0 auto; font-size: 12.5px; }
+@media (max-width: 960px) {
+  .rag-grid, .fix-diff { grid-template-columns: minmax(0, 1fr); }
+  .rag-search-form { flex-direction: column; }
+}
+.fix-questions { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+.fix-questions .pill { flex: none; }
+.fix-questions ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-weight: 600; min-width: 0; flex: 1; }
+.fix-after .fix-faq-q { font-weight: 700; }
+
+/* v4: steps stacked in the left column as a stepper */
+.split-side .rag-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.split-side .rag-step { border: 0; border-radius: 0; padding: 0 0 20px; background: none; position: relative; }
+.split-side .rag-step:first-child::before { content: ""; position: absolute; left: 15px; top: 34px; bottom: 0; width: 2px; background: var(--grid); }
+.rag-step .step-num { background: var(--surface); color: var(--text-primary); border: 2px solid var(--text-primary); }
+.split-side .rag-search { background: var(--surface-2); border: 0; }
+.split-side .rag-search-form { flex-direction: column; align-items: stretch; }
+.split-side .rag-search-form input { height: 40px; min-height: 40px; }
+.split-side .rag-search-form .btn-secondary { height: 40px; }

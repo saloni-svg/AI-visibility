@@ -1,0 +1,48 @@
+/* Content agent page. Its own file, so browsers always load the latest version. */
+/* ---------- Content agent ---------- */
+.agent-card { padding: 20px; display: grid; gap: 16px; }
+.agent-form { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(260px, 1.6fr) auto; gap: 12px; align-items: center; }
+.agent-form-text h2 { font-size: 17px; }
+.agent-form-text .note { margin: 2px 0 0; }
+.agent-form input { font: inherit; height: 44px; padding: 0 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-primary); }
+.agent-form input:focus { outline: none; border-color: var(--select-line); box-shadow: 0 0 0 3px var(--select-bg); }
+.agent-form .btn-primary { height: 44px; padding: 0 20px; margin: 0; }
+.agent-log { list-style: none; margin: 0; padding: 14px 16px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); display: grid; gap: 8px; max-height: 360px; overflow: auto; }
+.agent-log li { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+.agent-log-icon { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--wash); color: var(--text-secondary); }
+.agent-log-think { color: var(--text-secondary); font-style: italic; }
+.agent-log-draft .agent-log-icon, .agent-log-done .agent-log-icon { background: var(--good-soft); color: var(--good); }
+.agent-log-draft { font-weight: 600; }
+.agent-log-error { color: var(--bad); }
+.agent-log-error .agent-log-icon { background: var(--bad-soft); color: var(--bad); }
+.agent-log-pending { color: var(--text-muted); }
+.agent-spinner { width: 14px; height: 14px; margin: 4px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--accent); animation: agent-spin 0.8s linear infinite; }
+@keyframes agent-spin { to { transform: rotate(360deg); } }
+.agent-summary { padding: 18px 20px; border-radius: 10px; background: var(--select-bg); }
+.agent-summary h3 { margin: 0 0 6px; font-size: 14px; }
+.agent-summary p { margin: 0; white-space: pre-wrap; max-width: 90ch; line-height: 1.65; color: var(--text-secondary); }
+.drafts { list-style: none; margin: 0; padding: 0; }
+.draft { padding: 16px 20px; border-top: 1px solid var(--grid); display: grid; gap: 8px; }
+.draft-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.draft-head h3 { margin: 0; font-size: 15.5px; }
+.draft-reason { margin: 0; color: var(--text-secondary); }
+.draft-meta { display: grid; gap: 2px; font-size: 13px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.draft-content { white-space: pre-wrap; font: 13.5px/1.6 Inter, system-ui, sans-serif; margin: 4px 0 0; padding: 16px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); max-height: 520px; overflow: auto; }
+.draft-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media (max-width: 960px) { .agent-form { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .agent-spinner { animation: none; } }
+/* Layout polish */
+.agent-card .agent-form-text h2 { margin: 0; }
+.agent-log li > span:last-child { padding-top: 2px; }
+.draft-head .pill { flex: none; }
+.draft-meta b { color: var(--text-primary); font-weight: 600; margin-right: 4px; }
+.draft-meta span { display: block; }
+.draft-actions .link-btn { margin-left: 4px; }
+.drafts .draft:first-child { border-top: 0; }
+
+
+/* v4: agent runner in the side column */
+.split-side .agent-card { background: var(--surface-2); border: 0; }
+.split-side .agent-form { grid-template-columns: minmax(0, 1fr); }
+.split-side .agent-form .btn-primary { justify-self: start; }
+.split-side .agent-log { max-height: 60vh; overflow: auto; }
