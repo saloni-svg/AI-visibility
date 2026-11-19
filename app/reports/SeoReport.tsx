@@ -16,6 +16,36 @@ const pct = (a: number, b: number) => (b ? Math.round(((a - b) / b) * 100) : nul
 const short = (u: string) => u.replace(/^https?:\/\/(www\.)?[^/]+/, "") || "/";
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
+// The steps the agent took for this plan (what showed live while it ran), who wrote it and the cost.
+function HowMade({ plan }: { plan: NonNullable<Awaited<ReturnType<typeof loadSeoPage>>["plan"]> }) {
+  const log = plan.log ?? [];
+  const u = plan.plan.usage;
+  const secs = plan.finished_at ? Math.round((new Date(plan.finished_at).getTime() - new Date(plan.created_at).getTime()) / 1000) : null;
+  const icon = { think: "sparkles", tool: "database", done: "check", error: "alert" } as const;
+  return (
+    <details className="card seo-howmade">
+      <summary>
+        <span className="seo-howmade-title"><Icon name="sparkles" size={15} /> How this plan was made</span>
+        <span className="note">
+          {plan.plan.writtenBy ? <>Written by <b>{plan.plan.writtenBy}</b></> : "Written by the previous model (before Claude)"}
+          {secs != null ? ` · ${Math.floor(secs / 60)} min ${secs % 60} s` : ""}
+          {u ? ` · ${u.inputTokens.toLocaleString("en-IN")} tokens read, ${u.outputTokens.toLocaleString("en-IN")} written · $${u.costUsd.toFixed(2)}` : ""}
+        </span>
+      </summary>
+      {log.length > 0 && (
+        <ol className="agent-log">
+          {log.map((l, i) => (
+            <li key={i} className={`agent-log-${l.kind}`}>
+              <span className="agent-log-icon"><Icon name={icon[l.kind as keyof typeof icon] ?? "sparkles"} size={14} /></span>
+              <span>{l.text}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </details>
+  );
+}
+
 function Delta({ now, before, lowerIsBetter = false, label }: { now: number | null; before: number | null; lowerIsBetter?: boolean; label: string }) {
   if (now === null || before === null || !before) return null;
   const c = pct(now, before)!;
@@ -105,6 +135,7 @@ export default async function SeoReport({ domain, params, shared = false }: { do
         )
       ) : (
         <>
+          <HowMade plan={plan} />
           {d && <Kpis d={d} />}
           {d?.problems?.length ? <p className="note seo-problems">Missing data: {d.problems.join(" · ")}</p> : null}
           {/* key: a new plan replaces the list instead of keeping the previous plan's actions */}

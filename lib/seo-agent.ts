@@ -504,9 +504,9 @@ export async function loadSeoPage(brandId: string, planId?: string) {
   const list = plans ?? [];
   const running = list.find((p) => p.status === "running") ?? null;
   const chosen = list.find((p) => p.id === planId && p.status === "completed") ?? list.find((p) => p.status === "completed") ?? null;
-  let full: { id: string; created_at: string; focus: string | null; data: SeoData; plan: SeoPlan; sources: Sources | null } | null = null;
+  let full: { id: string; created_at: string; finished_at: string | null; focus: string | null; data: SeoData; plan: SeoPlan; sources: Sources | null; log: Log[] } | null = null;
   if (chosen) {
-    const { data } = await db().from("seo_plans").select("id, created_at, focus, data, plan, sources").eq("id", chosen.id).single();
+    const { data } = await db().from("seo_plans").select("id, created_at, finished_at, focus, data, plan, sources, log").eq("id", chosen.id).single();
     full = data as any;
   }
   return { plans: list, running, plan: full };

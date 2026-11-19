@@ -1,4 +1,12 @@
 /* SEO agent page */
+.seo-howmade { padding: 14px 18px; }
+.seo-howmade summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; list-style: none; }
+.seo-howmade summary::-webkit-details-marker { display: none; }
+.seo-howmade summary::after { content: "Show steps ▾"; margin-left: auto; font-size: 13px; color: var(--accent); font-weight: 600; }
+.seo-howmade[open] summary::after { content: "Hide steps ▴"; }
+.seo-howmade-title { display: inline-flex; align-items: center; gap: 6px; font-weight: 650; }
+.seo-howmade summary .note { margin: 0; }
+.seo-howmade .agent-log { margin-top: 12px; }
 .seo-sources { padding: 14px 18px; display: grid; gap: 12px; }
 .seo-sources > .note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
 .seo-sources-pick { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
