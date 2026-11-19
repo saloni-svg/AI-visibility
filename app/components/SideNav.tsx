@@ -1,7 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
+
+// A small spinner next to the menu item that was clicked, until its page opens.
+function Pending() {
+  const { pending } = useLinkStatus();
+  return <span aria-hidden="true" className={`nav-pending${pending ? " is-pending" : ""}`} />;
+}
 import { GROUPS } from "./SidebarNav";
 import { useDomain } from "./useDomain";
 
@@ -20,7 +26,7 @@ export default function SideNav() {
             {g.items.map((item) => (
               <li key={item.label}>
                 {item.href && (domain || item.always) ? (
-                  <Link href={item.href(domain ?? "")} aria-current={isCurrent(item.match, item.always) ? "page" : undefined}>{item.label}</Link>
+                  <Link href={item.href(domain ?? "")} aria-current={isCurrent(item.match, item.always) ? "page" : undefined}>{item.label}<Pending /></Link>
                 ) : (
                   <span className="leftnav-disabled" title={item.href ? "Analyze a domain first" : "Coming soon"}>
                     {item.label}
