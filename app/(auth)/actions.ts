@@ -1,8 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { authClient, safeNext } from "@/lib/auth";
+import { writeLog } from "@/lib/activity";
 
 export type AuthState = { error?: string; message?: string; email?: string } | undefined;
 
@@ -20,38 +20,24 @@ export async function signIn(_prev: AuthState, form: FormData): Promise<AuthStat
   if (!email || !password) return { error: "Enter your email and password.", email };
 
   const supabase = await authClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: friendly(error.message), email };
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    await writeLog({ id: null, email: email.toLowerCase() }, "signInFailed", { email }, { status: "error", error: error.message });
+    return { error: friendly(error.message), email };
+  }
+  await writeLog({ id: data.user.id, email: data.user.email ?? email }, "signIn", { email });
   redirect(safeNext(form.get("next")));
 }
 
 export async function signUp(_prev: AuthState, form: FormData): Promise<AuthState> {
-  const email = field(form, "email");
-  const password = String(form.get("password") ?? "");
-  const confirm = String(form.get("confirm") ?? "");
-  if (!email || !password) return { error: "Enter your email and a password.", email };
-  if (password.length < 8) return { error: "Use a password of at least 8 characters.", email };
-  if (password !== confirm) return { error: "The two passwords don't match.", email };
-
-  // Where the confirmation email's link should land.
-  const h = await headers();
-  const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
-
-  const supabase = await authClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${origin}/auth/callback` },
-  });
-  if (error) return { error: friendly(error.message), email };
-
-  // Email confirmation off in Supabase: the account is ready straight away.
-  if (data.session) redirect("/");
-  return { message: `Almost done: we sent a confirmation link to ${email}. Click it, then sign in.` };
+  // Accounts are created by the owner (Profile → Users), so sign-up is closed.
+  return { error: "Accounts are created by the owner. Ask them to add you.", email: field(form, "email") };
 }
 
 export async function signOut() {
   const supabase = await authClient();
+  const { data } = await supabase.auth.getUser();
+  if (data.user) await writeLog({ id: data.user.id, email: data.user.email ?? null }, "signOut", {});
   await supabase.auth.signOut();
   redirect("/login");
 }

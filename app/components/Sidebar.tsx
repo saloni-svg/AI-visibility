@@ -11,8 +11,8 @@ export default function Sidebar({ email }: { email: string }) {
       <div className="brand-lockup">
         <span className="logo-mark"><Icon name="logo" size={18} /></span>
         <div>
-          <div className="brand-name">AI Visibility</div>
-          <div className="brand-tag">Brand monitor</div>
+          <div className="brand-name rz-name">Ryze<span>IQ</span></div>
+          <div className="brand-tag">Search &amp; AI visibility</div>
         </div>
       </div>
       <Suspense fallback={<nav className="side-nav" aria-label="Main" />}>

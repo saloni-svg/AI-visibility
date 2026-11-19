@@ -1,7 +1,6 @@
-import AuthForm from "../../components/AuthForm";
+import { redirect } from "next/navigation";
 
-export const metadata = { title: "Sign up · AI Visibility" };
-
+// Sign-up is closed: the owner adds users from Profile → Users.
 export default function SignupPage() {
-  return <AuthForm mode="signup" />;
+  redirect("/login");
 }

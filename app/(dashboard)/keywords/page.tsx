@@ -6,10 +6,11 @@ import { getReport, recentReports, usdRates } from "@/lib/keyword-research";
 import Link from "next/link";
 import KeywordOverview from "../../components/KeywordOverview";
 import KeywordSearch from "../../components/KeywordSearch";
+import KeywordPlannerStatus from "../../components/KeywordPlannerStatus";
 
 export const dynamic = "force-dynamic";
 
-export default async function KeywordsPage({ searchParams }: { searchParams: Promise<{ q?: string; country?: string; device?: string; domain?: string }> }) {
+export default async function KeywordsPage({ searchParams }: { searchParams: Promise<{ q?: string; country?: string; device?: string; domain?: string; ads?: string; ads_error?: string }> }) {
   if (!(await currentUser())) redirect("/login");
   const p = await searchParams;
   const recent = await recentReports().catch(() => []);
@@ -30,6 +31,7 @@ export default async function KeywordsPage({ searchParams }: { searchParams: Pro
           <h1>Keyword Overview{q && <>: <span className="muted-strong">{q}</span></>}</h1>
         </div>
       </header>
+      <KeywordPlannerStatus next={`/keywords${q ? `?q=${encodeURIComponent(q)}&country=${country}&device=${device}` : ""}`} error={p.ads_error} justConnected={p.ads === "connected"} />
       <KeywordSearch key={`${q}|${country}|${device}`} q={q} country={country} device={device} countries={countries} autoRun={!!q && !report} />
       {recent.length > 1 && (
         <nav className="kw-recent" aria-label="Recent searches">

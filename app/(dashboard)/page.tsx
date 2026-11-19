@@ -3,15 +3,12 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@/lib/auth";
 import { listBrands } from "@/lib/brands";
 import { cleanDomain } from "@/lib/domain";
-import { loadOverview, PLATFORMS, type Overview } from "@/lib/overview";
 import DomainForm from "../components/DomainForm";
 import Icon from "../components/Icon";
-import OverviewView from "../components/OverviewView";
+import OverviewReport from "../reports/OverviewReport";
 
 // Always read fresh data from Supabase; nothing here is cached at build time.
 export const dynamic = "force-dynamic";
-
-const TABS = ["performing", "topic-opportunities", "cited-sources", "source-opportunities", "cited-pages"];
 
 export default async function Home({
   searchParams,
@@ -26,43 +23,7 @@ export default async function Home({
   const domain = cleanDomain(params.domain ?? "");
   if (!domain) return <StartPage />;
 
-  const platform = PLATFORMS.some((p) => p.value === params.platform) ? params.platform! : "all";
-  const tab = TABS.includes(params.tab ?? "") ? params.tab! : "performing";
-  const dist = params.dist === "pages" ? "pages" : "mentions";
-
-  let data: Overview;
-  try {
-    data = await loadOverview({ domain, runId: params.run, country: params.country ?? "all", platform });
-  } catch (err) {
-    return (
-      <main className="dash">
-        <div className="card empty-state empty-error">
-          <span className="empty-icon"><Icon name="alert" size={22} /></span>
-          <h2>Couldn&apos;t load data</h2>
-          <p className="note">{(err as Error).message ?? String(err)}</p>
-          <p className="note">
-            If it mentions a missing column or table, run <code>supabase/migrations/0002_visibility_overview.sql</code> in the Supabase SQL editor.
-          </p>
-        </div>
-      </main>
-    );
-  }
-
-  if (data.state !== "ok") {
-    return (
-      <main className="dash">
-        <div className="card empty-state">
-          <span className="empty-icon"><Icon name="database" size={22} /></span>
-          <h2>No results for {domain} yet</h2>
-          <p className="note">Run the first check to see how AI assistants talk about this brand.</p>
-          <Link href={`/analyze?domain=${domain}&force=1`} className="btn-primary btn-link">Analyze {domain}</Link>
-        </div>
-      </main>
-    );
-  }
-
-  const country = data.countryOptions.some((c) => c.code === params.country) ? params.country! : "all";
-  return <OverviewView data={data} domain={domain} params={{ country, platform, tab, dist }} platforms={PLATFORMS} />;
+  return <OverviewReport domain={domain} params={params} />;
 }
 
 // Shown when no domain is chosen: a landing screen with the domain box,
@@ -91,7 +52,7 @@ async function StartPage() {
       <section className="hero">
         <div className="hero-glow" aria-hidden="true" />
         <div className="hero-inner">
-          <p className="hero-kicker"><span className="hero-dot" />AI Visibility</p>
+          <p className="hero-kicker"><span className="hero-dot" />RyzeIQ</p>
           <h1 className="hero-title">
             Be the brand AI recommends
             <span>From search results to AI answers</span>

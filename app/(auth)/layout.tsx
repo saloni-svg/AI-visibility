@@ -1,3 +1,4 @@
+import BrandLockup from "../components/BrandMark";
 import Icon from "../components/Icon";
 
 // Sign-in and sign-up share this split screen: a brand panel and the form.
@@ -5,22 +6,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="auth-shell">
       <aside className="auth-brand">
-        <div className="brand-lockup brand-lockup-light">
-          <span className="logo-mark"><Icon name="logo" size={18} /></span>
-          <div>
-            <div className="brand-name">AI Visibility</div>
-            <div className="brand-tag">Brand monitor</div>
-          </div>
-        </div>
+        <BrandLockup tag="by DigitalRyze" />
 
         <div className="auth-pitch">
-          <h2>Know when AI recommends you.</h2>
-          <p>Track how ChatGPT, Gemini and Perplexity talk about your brand and your competitors.</p>
+          <h2>Rise in Google and in AI answers.</h2>
+          <p>RyzeIQ tracks your rankings, Search Console data and how ChatGPT, Gemini and Perplexity talk about your brand, then tells you what to do next.</p>
           <ul>
             {[
-              "Mention rate across every AI tool",
-              "Your position against competitors",
-              "The websites AI trusts as sources",
+              "Google rankings, search volume and CPC",
+              "AI visibility against your competitors",
+              "AI agents that write your SEO plan",
             ].map((item) => (
               <li key={item}>
                 <span className="check"><Icon name="check" size={14} /></span>

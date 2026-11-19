@@ -4,7 +4,8 @@ import { fmtDay, fmtNum } from "./format";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  connectGoogleListing, disconnectGoogle, draftReviewReply, findGoogleListings, refreshReviews, reviewsStep,
+  chooseGoogleBusinessLocation, connectGoogleListing, disconnectGoogle, disconnectGoogleBusinessProfile, draftReviewReply, findGoogleListings,
+  googleBusinessLocations, postReviewReply, refreshReviews, reviewsStep,
 } from "../(dashboard)/actions";
 import Icon from "./Icon";
 
@@ -14,6 +15,12 @@ type Review = {
   id: string; author: string | null; author_url: string | null; author_image: string | null; local_guide: boolean; rating: number | null;
   text: string | null; published_at: string | null; time_ago: string | null; owner_reply: string | null; owner_reply_at: string | null;
   review_url: string | null; photos: number | null; ai_reply: string | null;
+};
+type GbpLoc = { account: string; location: string; title: string; address: string | null; website: string | null; placeId: string | null; mapsUri: string | null; match: boolean };
+type Gbp = {
+  enabled: boolean; // GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET set
+  connection: { email: string | null; location: string | null; title: string | null; address: string | null } | null;
+  notice: string | null; error: string | null; // from the sign-in redirect
 };
 type Filter = "all" | "5" | "4" | "3" | "2" | "1" | "unanswered" | "answered";
 const PAGE = 20;
@@ -37,7 +44,90 @@ const GoogleMark = () => (
   </svg>
 );
 
-export default function ReviewsApp({ domain, source, reviews }: { domain: string; source: Source | null; reviews: Review[] }) {
+// Google Business Profile: sign in once, pick the location, then replies post straight to Google.
+function GbpPanel({ domain, gbp }: { domain: string; gbp: Gbp }) {
+  const router = useRouter();
+  const [locs, setLocs] = useState<GbpLoc[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(gbp.error ?? "");
+  const c = gbp.connection;
+  const needsPick = !!c && !c.location;
+
+  useEffect(() => {
+    if (!needsPick) return;
+    googleBusinessLocations(domain).then((r) => ("error" in r ? setError(r.error) : setLocs(r.locations)));
+  }, [needsPick, domain]);
+
+  async function pick(l: GbpLoc) {
+    setBusy(true);
+    const r = await chooseGoogleBusinessLocation(domain, l);
+    setBusy(false);
+    if ("error" in r) return setError(r.error);
+    router.replace(`/reviews?domain=${domain}`);
+    router.refresh();
+  }
+  async function disconnect() {
+    setBusy(true);
+    await disconnectGoogleBusinessProfile(domain);
+    setBusy(false);
+    router.replace(`/reviews?domain=${domain}`);
+    router.refresh();
+  }
+
+  return (
+    <section className="card rv-gbp">
+      {!c ? (
+        <div className="rv-gbp-row">
+          <div>
+            <p className="rv-gbp-title">Post replies straight to Google</p>
+            <p className="note">Sign in with the Google account that owns or manages this Business Profile. Replies then go to Google when you click <b>Reply on Google</b>.</p>
+          </div>
+          <a className="btn-dark btn-small" href={`/google/connect?domain=${encodeURIComponent(domain)}`} aria-disabled={!gbp.enabled}
+            onClick={(e) => { if (!gbp.enabled) { e.preventDefault(); setError("Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env, then restart the app."); } }}>
+            Connect Google Business Profile
+          </a>
+        </div>
+      ) : needsPick ? (
+        <div>
+          <p className="rv-gbp-title">Which Business Profile is {domain}?</p>
+          <p className="note">Signed in as {c.email ?? "your Google account"}.{locs && !locs.length ? " This account doesn't manage any Business Profile. Sign in with the account that does." : ""}</p>
+          {!locs && !error && <p className="note">Loading your locations…</p>}
+          {locs && locs.length > 0 && (
+            <ul className="rv-gbp-list">
+              {locs.map((l) => (
+                <li key={l.location}>
+                  <div>
+                    <p className="rv-pick-name">{l.title} {l.match && <span className="pill pill-strong">Matches this listing</span>}</p>
+                    <p className="note">{[l.address, l.website].filter(Boolean).join(" · ") || "No address"}</p>
+                  </div>
+                  <button type="button" className="btn-dark btn-small" disabled={busy} onClick={() => pick(l)}>Use this location</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {/scope/i.test(error) && (
+            <p className="note">Google didn&apos;t give this app permission to manage your Business Profile. Click <b>Reconnect</b> and, on Google&apos;s screen, tick <b>See, edit, create and delete your Google business listings</b>.</p>
+          )}
+          <button type="button" className="link-btn" onClick={disconnect} disabled={busy}>{/scope/i.test(error) ? "Reconnect" : "Use a different Google account"}</button>
+        </div>
+      ) : (
+        <div className="rv-gbp-row">
+          <p className="note rv-gbp-ok">
+            <span className="pill pill-strong">Connected</span> Replies post to <b>{c.title}</b>{c.address ? ` (${c.address})` : ""} as {c.email ?? "your Google account"}.
+            {gbp.notice === "chosen" && " Your Business Profile was found automatically."}
+          </p>
+          <button type="button" className="link-btn" onClick={disconnect} disabled={busy}>Disconnect</button>
+        </div>
+      )}
+      {error && <p className="field-error" role="alert">{error}</p>}
+    </section>
+  );
+}
+
+export default function ReviewsApp({ domain, source, reviews, gbp }: { domain: string; source: Source | null; reviews: Review[]; gbp: Gbp }) {
+  const canPost = !!gbp.connection?.location;
+  const [posting, setPosting] = useState<string | null>(null);
+  const [postError, setPostError] = useState<Record<string, string>>({});
   const router = useRouter();
   const [listings, setListings] = useState<Listing[] | null>(null);
   const [q, setQ] = useState("");
@@ -99,6 +189,14 @@ export default function ReviewsApp({ domain, source, reviews }: { domain: string
     setDrafting(null);
     if ("error" in r) return setError(r.error);
     setDrafts((d) => ({ ...d, [id]: r.reply }));
+  }
+  async function post(id: string) {
+    setPosting(id);
+    setPostError((e) => ({ ...e, [id]: "" }));
+    const r = await postReviewReply(domain, id, drafts[id] ?? "");
+    setPosting(null);
+    if ("error" in r) { setPostError((e) => ({ ...e, [id]: r.error })); router.refresh(); return; }
+    router.refresh(); // the review now shows "Your reply"
   }
   async function copy(id: string, text: string) {
     await navigator.clipboard.writeText(text);
@@ -197,6 +295,7 @@ export default function ReviewsApp({ domain, source, reviews }: { domain: string
           <p className="note">Getting reviews from Google. This usually takes 1–3 minutes; you can keep working, they&apos;ll appear here.</p>
         </div>
       )}
+      <GbpPanel domain={domain} gbp={gbp} />
       {source.status === "failed" && !fetching && <p className="field-error">Couldn&apos;t fetch reviews: {source.error}. Try Refresh reviews.</p>}
       {error && <p className="field-error">{error}</p>}
 
@@ -273,11 +372,17 @@ export default function ReviewsApp({ domain, source, reviews }: { domain: string
                   <div className="rv-draft">
                     {drafts[r.id] ? (
                       <>
-                        <label className="rv-reply-label" htmlFor={`d-${r.id}`}>AI draft reply (edit, then copy to Google)</label>
+                        <label className="rv-reply-label" htmlFor={`d-${r.id}`}>{canPost ? "AI draft reply (edit, then post to Google)" : "AI draft reply (edit, then copy to Google)"}</label>
                         <textarea id={`d-${r.id}`} rows={3} value={drafts[r.id]} onChange={(e) => setDrafts((d) => ({ ...d, [r.id]: e.target.value }))} />
                         <div className="draft-actions">
-                          <button type="button" className="btn-dark btn-small" onClick={() => copy(r.id, drafts[r.id])}>{copied === r.id ? "Copied" : "Copy reply"}</button>
-                          {r.review_url && (
+                          {canPost && (
+                            <button type="button" className="btn-dark btn-small" disabled={posting === r.id || !drafts[r.id]?.trim()} onClick={() => post(r.id)}
+                              title={`Posts this reply publicly on Google as ${gbp.connection?.title ?? "your business"}`}>
+                              {posting === r.id ? "Posting to Google…" : "Reply on Google"}
+                            </button>
+                          )}
+                          <button type="button" className={canPost ? "btn-secondary btn-small" : "btn-dark btn-small"} onClick={() => copy(r.id, drafts[r.id])}>{copied === r.id ? "Copied" : "Copy reply"}</button>
+                          {!canPost && r.review_url && (
                             <a className="btn-secondary btn-small" href={r.review_url} target="_blank" rel="noreferrer"
                               title="Copies your reply, then opens this review on Google: paste it into the reply box and post"
                               onClick={() => { navigator.clipboard.writeText(drafts[r.id]).catch(() => {}); setOpened(r.id); }}>
@@ -286,6 +391,7 @@ export default function ReviewsApp({ domain, source, reviews }: { domain: string
                           )}
                           <button type="button" className="link-btn" onClick={() => draft(r.id)} disabled={drafting === r.id}>{drafting === r.id ? "Writing…" : "Rewrite"}</button>
                         </div>
+                        {postError[r.id] && <p className="field-error rv-hint" role="alert">{postError[r.id]}</p>}
                         {opened === r.id && (
                           <p className="note rv-hint" role="status">Reply copied. On Google, click <b>Reply</b>, paste with <b>Cmd + V</b> (Ctrl + V on Windows) and press <b>Post</b>. You need to be signed in with the Google account that manages this business.</p>
                         )}

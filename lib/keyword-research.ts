@@ -2,11 +2,12 @@ import { COUNTRIES, CURRENCIES, type CountryCode } from "./countries";
 import { dataForSeo, hasDataForSeo } from "./dataforseo";
 import { config, requireEnv } from "./env";
 import { postJson } from "./http";
+import { keywordMetrics, metricsSource, plannerKey, type PlannerMetrics } from "./keyword-planner";
 import { db } from "./supabase";
 
-// Keyword Overview: everything about one keyword in one country, from DataForSEO (Google Ads
-// volumes, DataForSEO Labs ideas/difficulty/intent, live Google results), plus GPT for keyword
-// clusters. Where DataForSEO offers several figures, the one closest to Semrush's is used.
+// Keyword Overview: everything about one keyword in one country. Search volume, CPC and trend from
+// Google Keyword Planner only; DataForSEO for the rest (Labs ideas/difficulty/intent, live Google
+// results), plus GPT for keyword clusters. Where DataForSEO offers several figures, the one closest to Semrush's is used.
 // Saved and reused for 7 days.
 
 export type Idea = { keyword: string; volume: number | null; kd: number | null; cpc: number | null; intent: string | null };
@@ -62,15 +63,32 @@ export async function buildReport(keyword: string, country: CountryCode, device:
     safe("SERP", dataForSeo("serp/google/organic/live/advanced", [{ keyword: kw, ...loc, device, depth: 100 }], 60_000).then((r) => r.tasks[0].result?.[0] ?? null), null),
     usdRate(COUNTRIES[country].currency),
   ]);
-  const g = google.local;
-  if (!g && google.error) throw new Error(`Couldn't load keyword metrics. ${google.error}`);
+  // Search volume, average CPC and monthly trend only from Google Keyword Planner (our Google Ads
+  // API access) for the keyword, its variations and questions, and worldwide. Not connected or
+  // failed = left blank (never DataForSEO's figures).
+  let planned: Map<string, PlannerMetrics> | null = null;
+  let plannedWorld: PlannerMetrics | null = null;
+  if (await metricsSource()) {
+    planned = await safe("Keyword Planner",
+      keywordMetrics([kw, ...google.ideas.map((i) => i.keyword), ...google.questions.map((i) => i.keyword)], loc.location_code), null);
+    plannedWorld = planned ? (await keywordMetrics([kw], null).catch(() => null))?.get(kw) ?? null : null;
+  } else {
+    problems.push("Search volume & CPC: connect Google Ads (Keyword Planner).");
+  }
+  const p = planned?.get(kw) ?? null;
+  if (planned) {
+    const fill = (i: Idea): Idea => { const m = planned!.get(plannerKey(i.keyword)); return m ? { ...i, volume: m.volume, cpc: m.cpc } : i; };
+    google.ideas = google.ideas.map(fill);
+    google.questions = google.questions.map(fill);
+  }
 
   // DataForSEO prices are in USD; saved in the country's currency (USD if the rate is unavailable).
   const currency = rate === null ? "USD" : COUNTRIES[country].currency;
   const money = (usd: number | null | undefined) => (usd === null || usd === undefined ? null : Math.round(usd * (rate ?? 1) * 100) / 100);
 
   // Volume: Google Ads' 12-month average, already on Google's (and Semrush's) volume steps.
-  const volume: number | null = g ? g.search_volume ?? 0 : null;
+  const volume: number | null = p ? p.volume : null;
+  const cpcUsd = p ? p.cpc : null;
 
   // ---- Keyword ideas: variations and questions (both singular and plural forms) ----
   const dedupe = (list: Idea[]) => {
@@ -83,18 +101,20 @@ export async function buildReport(keyword: string, country: CountryCode, device:
   const sum = (l: Idea[]) => l.reduce((s, i) => s + (i.volume ?? 0), 0);
   // The keyword itself counts as one of its variations, as in Semrush.
   const variations = volume !== null
-    ? [{ keyword: kw, volume, kd: google.kd, cpc: money(cpcOf(g)), intent: google.intent }, ...ideas].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0))
+    ? [{ keyword: kw, volume, kd: google.kd, cpc: money(cpcUsd), intent: google.intent }, ...ideas].sort((a, b) => (b.volume ?? 0) - (a.volume ?? 0))
     : ideas;
 
   // ---- Global volume: Google's worldwide total, split by each country's clickstream share ----
-  const globalVolume = google.world ?? google.split?.search_volume ?? null;
-  const byCountry = ((google.split?.country_distribution ?? []) as any[])
+  const world = plannedWorld?.volume ?? null;
+  const globalVolume = world;
+  // Only each country's share comes from DataForSEO; the numbers are Keyword Planner's worldwide total.
+  const byCountry = world == null ? [] : ((google.split?.country_distribution ?? []) as any[])
+    .filter((c) => c.percentage != null)
     .map((c) => {
       const code = String(c.country_iso_code ?? "").toUpperCase();
       // The selected country shows the same number as the Volume card.
       if (code === country && volume !== null) return { code, volume };
-      const share = google.world != null && c.percentage != null ? Math.round((google.world * c.percentage) / 100) : c.search_volume ?? 0;
-      return { code, volume: share as number };
+      return { code, volume: Math.round((world * c.percentage) / 100) };
     })
     .filter((c) => c.code).sort((a, b) => b.volume - a.volume);
 
@@ -150,11 +170,12 @@ export async function buildReport(keyword: string, country: CountryCode, device:
 
   const report: KeywordReport = {
     keyword: kw, country, device, createdAt: new Date().toISOString(),
-    volume, cpc: money(cpcOf(g)), currency, usdRate: rate ?? 1,
+    volume, cpc: money(cpcUsd), currency, usdRate: rate ?? 1,
     // Competitive density: ads actually showing on Google for the keyword (0 = none, 1 = a full
     // page of 8), which tracks Semrush's advertiser-based density; Google's competition otherwise.
-    competition: serp ? Math.min(1, Math.round((ads.length / 8) * 100) / 100) : g?.competition_index != null ? Math.round(g.competition_index) / 100 : null,
-    trend: google.trend,
+    competition: serp ? Math.min(1, Math.round((ads.length / 8) * 100) / 100)
+      : p?.competition != null ? p.competition / 100 : null,
+    trend: p?.trend ?? [],
     globalVolume, byCountry,
     kd: google.kd, intents: [google.intent].filter(Boolean) as string[],
     variations: { total: Math.max(google.ideasTotal + (volume !== null ? 1 : 0), variations.length), totalVolume: sum(variations), items: variations },
@@ -166,7 +187,9 @@ export async function buildReport(keyword: string, country: CountryCode, device:
       rows, backlinksAvailable: !!backlinks,
     },
     ads, pla, problems,
-    source: "DataForSEO",
+    source: planned
+      ? "Google Keyword Planner (volume & CPC), DataForSEO (everything else)"
+      : "DataForSEO (volume & CPC unavailable: Google Keyword Planner not connected)",
     notice: !volume && !ideas.length
       ? `No search data for "${kw}" in ${COUNTRIES[country].name}: it's searched too rarely to be tracked. Try a shorter or more common phrase.`
       : undefined,
@@ -175,7 +198,7 @@ export async function buildReport(keyword: string, country: CountryCode, device:
   return report;
 }
 
-// Google Ads volumes plus DataForSEO Labs keyword ideas, questions, intent and difficulty. DataForSEO
+// DataForSEO Labs keyword ideas, questions, intent and difficulty. DataForSEO
 // only matches the exact phrase, so the singular/plural form is searched too ("home improvements"
 // also finds "home improvement ..."), like Semrush's broad match. CPCs here are in USD.
 async function googleData(kw: string, loc: { location_code: number; language_code: string }) {
@@ -185,11 +208,7 @@ async function googleData(kw: string, loc: { location_code: number; language_cod
     dataForSeo("dataforseo_labs/google/keyword_suggestions/live", [
       { keyword: f, ...loc, include_seed_keyword: f !== kw, limit, order_by: ["keyword_info.search_volume,desc"], ...(filters ? { filters } : {}) },
     ], 60_000).then(first).catch(() => null)));
-  let error: string | null = null;
-  const [local, world, split, ideaSets, questionSets, intent, kd] = await Promise.all([
-    dataForSeo("keywords_data/google_ads/search_volume/live", [{ keywords: [kw], ...loc }], 45_000).then(first).catch((e) => { error = (e as Error).message; return null; }),
-    // No location or language = Google's worldwide volume.
-    dataForSeo("keywords_data/google_ads/search_volume/live", [{ keywords: [kw] }], 45_000).then(first).catch(() => null),
+  const [split, ideaSets, questionSets, intent, kd] = await Promise.all([
     // Clickstream data is only used for each country's share; its own totals run far too low.
     dataForSeo("keywords_data/clickstream_data/global_search_volume/live", [{ keywords: [kw] }], 45_000).then((r) => r.tasks[0].result?.[0]?.items?.[0] ?? null).catch(() => null),
     suggestions(1000),
@@ -199,17 +218,14 @@ async function googleData(kw: string, loc: { location_code: number; language_cod
     dataForSeo("dataforseo_labs/google/bulk_keyword_difficulty/live", [{ keywords: [kw], ...loc }], 45_000)
       .then((r) => r.tasks[0].result?.[0]?.items?.[0]?.keyword_difficulty ?? null).catch(() => null),
   ]);
+  // Volume and CPC are filled in from Google Keyword Planner afterwards, never from DataForSEO.
   const toIdeas = (sets: any[]): Idea[] => sets.flatMap((r) => (r?.items ?? []) as any[]).map((i) => ({
-    keyword: i.keyword, volume: i.keyword_info?.search_volume ?? null, kd: i.keyword_properties?.keyword_difficulty ?? null,
-    cpc: i.keyword_info?.cpc ?? null, intent: i.search_intent_info?.main_intent ?? null,
+    keyword: i.keyword, volume: null, kd: i.keyword_properties?.keyword_difficulty ?? null,
+    cpc: null, intent: i.search_intent_info?.main_intent ?? null,
   }));
   const total = (sets: any[]) => sets.reduce((s, r) => s + (r?.total_count ?? 0), 0);
   return {
-    local, error: error as string | null, world: (world?.search_volume ?? null) as number | null, split,
-    // Months Google hasn't published yet come back empty; leave them out rather than show 0.
-    trend: ((local?.monthly_searches ?? []) as any[]).filter((x) => x.search_volume != null)
-      .map((x) => ({ month: `${x.year}-${String(x.month).padStart(2, "0")}`, volume: x.search_volume as number }))
-      .sort((a, b) => a.month.localeCompare(b.month)).slice(-12),
+    split,
     ideas: toIdeas(ideaSets), ideasTotal: total(ideaSets) as number,
     questions: toIdeas(questionSets), questionsTotal: total(questionSets) as number,
     intent: (intent?.keyword_intent?.label ?? null) as string | null,
@@ -247,10 +263,6 @@ async function usdRate(currency: string): Promise<number | null> {
   if (currency === "USD") return 1;
   return (await usdRates())?.[currency] ?? null;
 }
-
-// CPC (USD): Google's low top-of-page bid tracked Semrush's CPC far better than Google's average
-// CPC (e.g. "home improvements" UK: low bid $2.33, average $7.37, Semrush 2.47).
-const cpcOf = (g: any): number | null => g?.low_top_of_page_bid ?? g?.cpc ?? null;
 
 async function clusterIdeas(seed: string, ideas: Idea[]) {
   const raw = await postJson(

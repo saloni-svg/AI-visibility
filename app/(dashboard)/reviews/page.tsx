@@ -5,14 +5,16 @@ import { currentUser } from "@/lib/auth";
 import { findBrand } from "@/lib/brands";
 import { cleanDomain } from "@/lib/domain";
 import { loadReviews } from "@/lib/reviews";
+import { connectionInfo, hasGoogleOAuth } from "@/lib/google-business";
 import Icon from "../../components/Icon";
 import ReviewsApp from "../../components/ReviewsApp";
 
 export const dynamic = "force-dynamic";
 
-export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ domain?: string }> }) {
+export default async function ReviewsPage({ searchParams }: { searchParams: Promise<{ domain?: string; gbp?: string; gbp_error?: string }> }) {
   if (!(await currentUser())) redirect("/login");
-  const domain = cleanDomain((await searchParams).domain ?? "");
+  const params = await searchParams;
+  const domain = cleanDomain(params.domain ?? "");
   if (!domain) redirect("/");
   const brand = await findBrand(domain);
   if (!brand) {
@@ -46,10 +48,11 @@ export default async function ReviewsPage({ searchParams }: { searchParams: Prom
         <div>
           <p className="crumbs">Home <span aria-hidden="true">›</span> Boost &amp; Monitor <span aria-hidden="true">›</span> Review management</p>
           <h1>Review management: <span className="muted-strong">{domain}</span></h1>
-          <p className="subtitle">All Google reviews for this business in one place, with AI-drafted replies.</p>
+          <p className="subtitle">All Google reviews for this business in one place, with AI-drafted replies you can post to Google.</p>
         </div>
       </header>
-      <ReviewsApp domain={domain} source={data.source} reviews={data.reviews} />
+      <ReviewsApp domain={domain} source={data.source} reviews={data.reviews}
+        gbp={{ enabled: hasGoogleOAuth(), connection: await connectionInfo(brand.id), notice: params.gbp ?? null, error: params.gbp_error ?? null }} />
     </main>
   );
 }

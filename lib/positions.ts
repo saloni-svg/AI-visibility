@@ -7,6 +7,7 @@ import { isReady, providers } from "./providers";
 import { dataForSeo, hasDataForSeo } from "./dataforseo";
 import { addKeywords as kcAddKeywords, ensureProject, hasKeywordCom, KC_FEATURES, KC_REGIONS, listKeywords as kcListKeywords, topResults as kcTopResults, type KcKeyword } from "./keywordcom";
 import { config, requireEnv } from "./env";
+import { keywordMetrics, plannerKey, plannerReady } from "./keyword-planner";
 import { postJson, runPool } from "./http";
 import { isIndexed, searchSite } from "./rag/search";
 import { db } from "./supabase";
@@ -25,7 +26,7 @@ const CTR = [0, 0.28, 0.15, 0.11, 0.08, 0.07, 0.05, 0.04, 0.03, 0.03, 0.025];
 export const ctr = (pos: number | null) => (pos === null ? 0 : pos <= 10 ? CTR[pos] : pos <= 20 ? 0.01 : 0.002);
 
 // ---- Keywords ----
-export async function addKeywords(brandId: string, country: string, keywords: string[]) {
+export async function addKeywords(brandId: string, country: string, keywords: string[], project?: string | null) {
   const list = [...new Set(keywords.map(clean).filter((k) => k.length >= 2))].slice(0, 100);
   if (!list.length) return 0;
   const { error } = await db()
@@ -34,7 +35,7 @@ export async function addKeywords(brandId: string, country: string, keywords: st
   if (error) throw error;
   await refreshVolumes(brandId, country).catch((e) => console.error(`Search volume failed: ${e.message}`));
   // Queue them in Keyword.com right away, so they have a position by the next check.
-  if (hasKeywordCom()) await syncKeywordCom(brandId, country).catch((e) => console.error(`Keyword.com sync failed: ${e.message}`));
+  if (hasKeywordCom()) await syncKeywordCom(brandId, country, project).catch((e) => console.error(`Keyword.com sync failed: ${e.message}`));
   clearCache();
   return list.length;
 }
@@ -45,39 +46,51 @@ export async function removeKeyword(brandId: string, keywordId: string) {
   clearCache();
 }
 
-// Keyword metrics from DataForSEO, refreshed every 30 days:
-//   search volume + CPC (Google Ads data), keyword difficulty and search intent (DataForSEO Labs).
+// Keyword metrics, refreshed every 30 days: search volume + average CPC only from Google Keyword
+// Planner (Google Ads API); keyword difficulty and search intent from DataForSEO Labs. Rows whose
+// volume came from anywhere else (older DataForSEO figures) are re-fetched from Keyword Planner.
 export async function refreshVolumes(brandId: string, country: string): Promise<string[]> {
   const problems: string[] = [];
-  if (!hasDataForSeo() || !isCountry(country)) return problems;
+  const planner = await plannerReady().catch(() => false);
+  if ((!hasDataForSeo() && !planner) || !isCountry(country)) return problems;
   const stale = new Date(Date.now() - 30 * 86_400_000).toISOString();
   const { data } = await db().from("tracked_keywords").select("id, keyword").eq("brand_id", brandId).eq("country", country)
-    .eq("active", true).or(`metrics_at.is.null,metrics_at.lt.${stale}`).limit(700);
+    .eq("active", true)
+    .or(`metrics_at.is.null,metrics_at.lt.${stale}${planner ? ",volume_source.is.null,volume_source.neq.keyword_planner" : ""}`).limit(700);
   if (!data?.length) return problems;
   const keywords = data.map((d) => d.keyword);
   const loc = { location_code: COUNTRIES[country].locationCode, language_code: "en" };
   const lower = (k: unknown) => String(k).toLowerCase();
+  const none = <T,>() => Promise.resolve(new Map<string, T>());
 
   const [ads, kd, intent] = await Promise.all([
-    dataForSeo("keywords_data/google_ads/search_volume/live", [{ keywords, ...loc }], 40_000)
-      .then((raw) => new Map<string, any>((raw.tasks[0].result ?? []).map((r: any) => [lower(r.keyword), r])))
-      .catch((e) => { problems.push(`Search volume & CPC: ${e.message}`); return new Map<string, any>(); }),
-    dataForSeo("dataforseo_labs/google/bulk_keyword_difficulty/live", [{ keywords, ...loc }], 40_000)
-      .then((raw) => new Map<string, number>((raw.tasks[0].result?.[0]?.items ?? []).map((r: any) => [lower(r.keyword), r.keyword_difficulty])))
-      .catch((e) => { problems.push(`Keyword difficulty: ${e.message}`); return new Map<string, number>(); }),
-    dataForSeo("dataforseo_labs/google/search_intent/live", [{ keywords, language_code: "en" }], 40_000)
-      .then((raw) => new Map<string, any>((raw.tasks[0].result?.[0]?.items ?? []).map((r: any) => [lower(r.keyword), r])))
-      .catch((e) => { problems.push(`Search intent: ${e.message}`); return new Map<string, any>(); }),
+    // Keyword Planner figures through our own Google Ads API access; nothing when not connected.
+    planner
+      ? keywordMetrics(keywords, loc.location_code)
+        .then((m) => new Map<string, any>([...m].map(([k, v]) => [k, { search_volume: v.volume, cpc: v.cpc, source: "keyword_planner" }])))
+        .catch((e) => { problems.push(`Search volume & CPC: ${e.message}`); return new Map<string, any>(); })
+      : none<any>(),
+    hasDataForSeo()
+      ? dataForSeo("dataforseo_labs/google/bulk_keyword_difficulty/live", [{ keywords, ...loc }], 40_000)
+        .then((raw) => new Map<string, number>((raw.tasks[0].result?.[0]?.items ?? []).map((r: any) => [lower(r.keyword), r.keyword_difficulty])))
+        .catch((e) => { problems.push(`Keyword difficulty: ${e.message}`); return new Map<string, number>(); })
+      : none<number>(),
+    hasDataForSeo()
+      ? dataForSeo("dataforseo_labs/google/search_intent/live", [{ keywords, language_code: "en" }], 40_000)
+        .then((raw) => new Map<string, any>((raw.tasks[0].result?.[0]?.items ?? []).map((r: any) => [lower(r.keyword), r])))
+        .catch((e) => { problems.push(`Search intent: ${e.message}`); return new Map<string, any>(); })
+      : none<any>(),
   ]);
 
   await runPool(data, 10, async (d) => {
     const k = d.keyword.toLowerCase();
-    const a = ads.get(k);
+    const a = ads.get(plannerKey(d.keyword));
     const i = intent.get(k);
     const update: Record<string, unknown> = problems.length < 3 ? { metrics_at: new Date().toISOString(), volume_at: new Date().toISOString() } : {};
     if (a) {
       update.search_volume = a.search_volume ?? 0;
       update.cpc = a.cpc ?? null;
+      if (a.source) update.volume_source = a.source; // only set once the 0013 migration has added the column
     }
     if (kd.has(k)) update.keyword_difficulty = kd.get(k) ?? null;
     if (i?.keyword_intent?.label) {
@@ -154,13 +167,13 @@ export async function setTrackingLocation(brandId: string, country: string, loca
 // keywords tracked there for this country are imported; active keywords here that are missing
 // there are added. Keywords removed here are left alone in Keyword.com, and keywords removed
 // here are not re-imported.
-export async function syncKeywordCom(brandId: string, country: string) {
+export async function syncKeywordCom(brandId: string, country: string, preferredProject?: string | null) {
   const region = KC_REGIONS[country];
   if (!region) throw new Error(`Keyword.com tracking isn't set up for ${countryName(country)}.`);
   const { data: b, error } = await db().from("brands").select("domain, tracking_locations").eq("id", brandId).single();
   if (error || !b?.domain) throw new Error("Brand not found.");
   const location = ((b.tracking_locations ?? {}) as Record<string, { name: string }>)[country] ?? null;
-  const project = await ensureProject(b.domain);
+  const project = await ensureProject(b.domain, preferredProject);
   const theirs = (await kcListKeywords(project)).filter((k) => k.region === region && k.type === "se");
   const theirSet = new Set(theirs.map((k) => clean(k.kw)));
   const { data: ours } = await db().from("tracked_keywords").select("keyword, active").eq("brand_id", brandId).eq("country", country);
@@ -177,9 +190,9 @@ export async function syncKeywordCom(brandId: string, country: string) {
   return { project, region, imported: imported.length, added: missing.length };
 }
 
-export async function startPositionRun(brandId: string, country: string, options: RunOptions = { maps: true, ai: true }) {
+export async function startPositionRun(brandId: string, country: string, options: RunOptions = { maps: true, ai: true }, project?: string | null) {
   if (hasKeywordCom()) {
-    const sync = await syncKeywordCom(brandId, country);
+    const sync = await syncKeywordCom(brandId, country, project);
     const { count } = await db().from("tracked_keywords").select("id", { count: "exact", head: true })
       .eq("brand_id", brandId).eq("country", country).eq("active", true);
     if (!count) throw new Error("Add some keywords first.");

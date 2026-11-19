@@ -77,3 +77,14 @@
 }
 .rv-reply-text { white-space: pre-wrap; }
 .rv-hint { margin: 0; padding: 8px 12px; background: var(--good-soft); color: var(--text-primary); border-radius: 6px; }
+
+/* Google Business Profile connection */
+.rv-gbp { padding: 16px 20px; display: grid; gap: 10px; }
+.rv-gbp-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.rv-gbp-row .note { margin: 2px 0 0; }
+.rv-gbp-title { margin: 0; font-weight: 600; }
+.rv-gbp-ok { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rv-gbp-list { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+.rv-gbp-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; }
+.rv-gbp-list .note, .rv-gbp-list .rv-pick-name { margin: 0; }
+.rv-gbp a[aria-disabled="true"] { opacity: 0.6; }

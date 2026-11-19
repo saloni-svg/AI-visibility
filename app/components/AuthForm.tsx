@@ -74,8 +74,8 @@ export default function AuthForm({ mode, next, initialError }: { mode: "signin" 
       )}
 
       <p className="auth-switch">
-        {isSignIn ? "New to AI Visibility? " : "Already have an account? "}
-        <Link href={isSignIn ? "/signup" : "/login"}>{isSignIn ? "Create an account" : "Sign in"}</Link>
+        {isSignIn ? "No account? The owner adds users. " : "Already have an account? "}
+        {!isSignIn && <Link href="/login">Sign in</Link>}
       </p>
     </div>
   );

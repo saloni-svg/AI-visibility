@@ -1,0 +1,42 @@
+/* SEO agent page */
+.seo-sources { padding: 14px 18px; display: grid; gap: 12px; }
+.seo-sources > .note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+.seo-sources-pick { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.seo-sources-pick label { display: grid; gap: 4px; font-size: 12.5px; color: var(--text-secondary); }
+.seo-sources-pick select { font: inherit; height: 36px; min-width: 260px; max-width: 420px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-primary); }
+.seo-history { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.seo-history a { font-size: 13px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-secondary); text-decoration: none; }
+.seo-history a[aria-current="page"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+.seo-problems { margin: 0; }
+.seo-summary p { margin: 0 0 10px; line-height: 1.6; }
+.seo-priorities { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 4px; font-weight: 500; }
+.seo-plan-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.seo-pad { padding: 0 20px; }
+.seo-period { padding: 4px 20px 16px; }
+.seo-period h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin: 10px 0 8px; }
+.seo-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.seo-action { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; break-inside: avoid; }
+.seo-action.is-done { opacity: 0.6; }
+.seo-action.is-done h4 { text-decoration: line-through; }
+.seo-action p { margin: 0; font-size: 14px; line-height: 1.55; }
+.seo-action-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.seo-action-head h4 { margin: 0 0 4px; font-size: 15.5px; }
+.seo-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.seo-tags .pill { text-transform: capitalize; }
+.seo-action-btns { display: flex; gap: 6px; flex: none; }
+.seo-target { font-size: 13.5px; }
+.seo-steps { margin: 2px 0; padding-left: 20px; font-size: 14px; display: grid; gap: 2px; }
+.seo-impact .note { font-size: 13px; }
+.seo-draft { margin-top: 4px; padding: 10px 12px; border-radius: 8px; background: var(--surface-2); border: 1px dashed var(--border); display: grid; gap: 4px; font-size: 13.5px; }
+.seo-draft ul { margin: 2px 0 0; padding-left: 18px; }
+.seo-draft-label { display: inline-block; min-width: 118px; font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); }
+.seo-section { font-size: 18px; margin: 10px 0 -6px; }
+.seo-table td.num, .seo-table th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.seo-table td { font-size: 13.5px; }
+.seo-pages { display: grid; gap: 2px; text-align: left; }
+.seo-bars { display: flex; align-items: flex-end; gap: 6px; height: 180px; padding-top: 18px; }
+.seo-bar { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; }
+.seo-bar-fill { width: 100%; max-width: 38px; background: var(--you, var(--brand)); border-radius: 4px 4px 0 0; }
+.seo-bar-val { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
+.seo-bar-label { font-size: 11px; color: var(--text-muted); }
+@media (max-width: 700px) { .seo-action-head { flex-direction: column; } .seo-bar-val { display: none; } }

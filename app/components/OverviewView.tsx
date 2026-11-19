@@ -10,6 +10,7 @@ import Icon from "./Icon";
 import InsightsButton from "./InsightsButton";
 import PlatformSelect from "./PlatformSelect";
 import RunPicker from "./RunPicker";
+import ReportActions from "./ReportActions";
 import Sparkline from "./Sparkline";
 import TrendChart from "./TrendChart";
 
@@ -37,8 +38,8 @@ function Delta({ value, prev }: { value: number; prev: number | null }) {
 }
 
 export default function OverviewView({
-  data, domain, params: initial, platforms,
-}: { data: Data; domain: string; params: Params; platforms: { value: string; label: string }[] }) {
+  data, domain, params: initial, platforms, shared = false,
+}: { data: Data; domain: string; params: Params; platforms: { value: string; label: string }[]; shared?: boolean }) {
   // Tabs and toggles switch instantly in the browser; the URL is kept in sync so links still work.
   const [tab, setTabState] = useState(initial.tab);
   const [dist, setDistState] = useState(initial.dist);
@@ -80,12 +81,13 @@ export default function OverviewView({
           <h1>Visibility overview: <span className="muted-strong">{domain}</span></h1>
         </div>
         <div className="header-actions">
-          <Link href={`/competitors?domain=${domain}`} className="btn-secondary">Competitor research</Link>
-          <Link href={`/analyze?domain=${domain}&force=1`} className="btn-primary btn-link">Run new check</Link>
+          <ReportActions kind="overview" domain={domain} shared={shared} title={`AI visibility overview - ${domain} - ${data.run.label}`} />
+          {!shared && <Link href={`/competitors?domain=${domain}`} className="btn-secondary">Competitor research</Link>}
+          {!shared && <Link href={`/analyze?domain=${domain}&force=1`} className="btn-primary btn-link">Run new check</Link>}
         </div>
       </header>
 
-      <div className="filter-bar">
+      {shared ? <SharedFilters data={data} params={params} platforms={platforms} /> : <div className="filter-bar">
         <nav className="segmented" aria-label="Country">
           <Link href={q({ country: "all" })} scroll={false} aria-current={params.country === "all"}>🌐 Worldwide</Link>
           {data.countryOptions.map((c) => (
@@ -99,7 +101,7 @@ export default function OverviewView({
         />
         <PlatformSelect value={params.platform} options={platforms} query={`domain=${domain}&country=${params.country}`} />
         <RunPicker runs={data.runs} value={data.run.id} query={filterQuery} />
-      </div>
+      </div>}
 
       <div className="ov-layout">
         <div className="ov-main">
@@ -379,5 +381,15 @@ function SimpleTable({ head, rows, empty }: { head: string[]; rows: React.ReactN
         </tbody>
       </table>
     </div>
+  );
+}
+
+// On a shared (read-only) page: the filters the report was shared with, as plain text.
+function SharedFilters({ data, params, platforms }: { data: Data; params: Params; platforms: { value: string; label: string }[] }) {
+  const c = data.countryOptions.find((x) => x.code === params.country);
+  return (
+    <p className="note shared-filters">
+      {c ? `${c.flag} ${c.code}` : "🌐 Worldwide"} · {platforms.find((p) => p.value === params.platform)?.label ?? "All AI sources"} · Check of {data.run.label}
+    </p>
   );
 }

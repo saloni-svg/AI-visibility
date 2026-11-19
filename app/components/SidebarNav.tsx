@@ -17,9 +17,16 @@ export const GROUPS: { title: string; items: Item[] }[] = [
   { title: "Keyword Research", items: [{ label: "Keyword overview", href: (d) => (d ? `/keywords?domain=${d}` : "/keywords"), match: "/keywords", always: true }] },
   { title: "Brand Performance", items: [{ label: "Brand performance" }, { label: "Perception" }, { label: "Narrative drivers" }, { label: "Questions" }] },
   {
+    // AI agents that analyse a domain and do the work; more agents get added here.
+    title: "AI Agents",
+    items: [
+      { label: "SEO agent", href: (d) => `/seo?domain=${d}`, match: "/seo" },
+      { label: "Content agent", href: (d) => `/agent?domain=${d}`, match: "/agent" },
+    ],
+  },
+  {
     title: "Boost & Monitor",
     items: [
-      { label: "Content agent", href: (d) => `/agent?domain=${d}`, match: "/agent" },
       { label: "Page fixes", href: (d) => `/fixes?domain=${d}`, match: "/fixes" },
       { label: "Position tracking", href: (d) => `/positions?domain=${d}`, match: "/positions" },
       { label: "Site audit", href: () => "/audit", match: "/audit", always: true },

@@ -225,7 +225,7 @@ export default function CompetitorTable({
                       <span className="cr-vol"><Sparkline values={t.volume?.monthly ?? []} /><b>{t.volume ? compact(t.volume.volume) : "n/a"}</b></span>
                       {intentBar(t.intents)}
                       <span className="cr-act">
-                        <button type="button" className={t.monitoring ? "btn-dark btn-small" : "btn-secondary btn-small"} disabled={pending && busyTopic === t.name}
+                        <button type="button" className={`cr-monitor ${t.monitoring ? "btn-dark btn-small" : "btn-secondary btn-small"}`} disabled={pending && busyTopic === t.name}
                           onClick={() => monitor(t)} title={t.monitoring ? "These questions are checked in every run. Click to pause them." : "Paused: click to check these questions again."}>
                           <Icon name="search" size={14} /> {t.monitoring ? "Monitoring" : "Monitor all prompts"}
                         </button>

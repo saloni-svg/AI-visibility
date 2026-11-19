@@ -1259,3 +1259,64 @@ tbody tr:hover td, .cr-row:not(.cr-head):hover { background: var(--surface-2); }
   .leftnav-group { flex: none; }
   .app-body > .appbar .domain-form { width: 220px; }
 }
+
+/* Where search volume and CPC come from (Keyword Planner status) */
+.kp-status { margin: 0 0 12px; }
+.kp-status .note { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+
+/* Report export: "Export PDF" and "Share link" (ReportActions) */
+.report-actions { display: flex; flex-direction: column; gap: 8px; }
+.report-actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-actions .btn-small { display: inline-flex; align-items: center; gap: 6px; }
+.report-link { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 560px; }
+.report-link input { flex: 1 1 260px; min-width: 0; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 12.5px; color: var(--text-primary); background: var(--surface); }
+.report-link .note { flex-basis: 100%; margin: 0; font-size: 12px; }
+.rr-toolbar .report-actions { flex-direction: row; flex-wrap: wrap; align-items: center; }
+.rr-toolbar .report-link { flex-basis: 100%; }
+.shared-filters { margin: 6px 0 0; }
+
+/* Shared, read-only report page (/share/…) */
+.shared-view { min-height: 100vh; }
+.shared-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; max-width: 1240px; margin: 0 auto; padding: 16px 32px 0; }
+.shared-bar .logo-mark { width: 26px; height: 26px; border-radius: 7px; background: var(--brand); color: #fff; display: inline-grid; place-items: center; }
+.shared-bar .note { margin: 0; }
+.shared-view .ch-nobase button, .shared-view .pt-remove, .shared-view .cr-monitor { display: none !important; }
+
+/* PDF export (print → Save as PDF): only the report, no app menus or controls */
+@media print {
+  @page { margin: 12mm; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #fff !important; }
+  .leftnav, .appbar, .filter-bar, .no-print, .shared-bar, .ch-runner, .kp-status,
+  .cr-toolbar input[type="search"], .rr-search, .ch-nobase button, .pt-remove, .cr-monitor { display: none !important; }
+  .app-frame { display: block !important; }
+  .dash { max-width: none !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
+  .dash, .dash * { overflow: visible !important; max-height: none !important; }
+  .split-side, .ov-aside, .kw-metrics, .cr-insights { position: static !important; }
+  .card { box-shadow: none !important; }
+  .stat, .metric, .score-card, .pt-plat { break-inside: avoid; }
+  .cr-row, tr { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  /* One section only (e.g. the keyword rank report) */
+  body.print-scope main.dash > :not(.print-target) { display: none !important; }
+  body.print-scope .print-target { break-inside: auto; }
+}
+
+
+/* Top-right profile menu (ProfileMenu) */
+.pm { position: relative; flex: none; }
+.pm-button { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px 3px 3px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text-secondary); cursor: pointer; }
+.pm-button:hover, .pm-button[aria-expanded="true"] { border-color: var(--select-line, var(--accent)); box-shadow: 0 0 0 3px var(--select-bg, rgba(0,0,0,0.05)); }
+.pm-avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--brand); color: #fff; font-weight: 650; font-size: 13.5px; letter-spacing: 0.02em; }
+.pm-avatar-lg { width: 44px; height: 44px; font-size: 16px; }
+.pm-caret { color: var(--text-muted); }
+.pm-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 50; width: 290px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14); overflow: hidden; }
+.pm-who { display: flex; gap: 12px; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); }
+.pm-who-text { display: grid; gap: 3px; min-width: 0; justify-items: start; }
+.pm-who-text b { font-size: 14.5px; }
+.pm-email { font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+.pm-links { display: grid; padding: 6px; }
+.pm-links a, .pm-signout button { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; font-size: 14px; color: var(--text-primary); text-decoration: none; background: none; border: 0; width: 100%; font: inherit; cursor: pointer; text-align: left; }
+.pm-links a:hover, .pm-signout button:hover { background: var(--surface-2); }
+.pm-signout { padding: 6px; border-top: 1px solid var(--border); margin: 0; }
+.pm-signout button { color: var(--bad); }

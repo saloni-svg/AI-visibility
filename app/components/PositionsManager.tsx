@@ -8,9 +8,10 @@ import Icon from "./Icon";
 // Add keywords (typed or AI-suggested) and run a position check with progress.
 type Loc = { code: number; name: string; type?: string; auto?: boolean };
 
-export default function PositionsManager({ domain, country, countryName, keywordCount, location, tracker }: {
+export default function PositionsManager({ domain, country, countryName, keywordCount, location, tracker, project = null }: {
   domain: string; country: string; countryName: string; keywordCount: number; location: Loc | null;
   tracker: "keywordcom" | "dataforseo";
+  project?: string | null; // the Keyword.com project picked in the rank report
 }) {
   const kc = tracker === "keywordcom";
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function PositionsManager({ domain, country, countryName, keyword
   async function add(list: string[]) {
     setError("");
     setBusy("add");
-    const r = await addTrackedKeywords(domain, country, list);
+    const r = await addTrackedKeywords(domain, country, list, project);
     setBusy("");
     if ("error" in r) return setError(r.error);
     setText("");
@@ -66,7 +67,7 @@ export default function PositionsManager({ domain, country, countryName, keyword
     setError("");
     setBusy("check");
     setInfo("");
-    const start = await startPositionCheck(domain, country, kc ? { maps: false, ai: false } : { maps, ai });
+    const start = await startPositionCheck(domain, country, kc ? { maps: false, ai: false } : { maps, ai }, project);
     if ("error" in start) { setBusy(""); return setError(start.error); }
     if (start.imported || start.added) {
       setInfo([start.imported ? `${start.imported} keywords imported from Keyword.com` : "", start.added ? `${start.added} keywords added to Keyword.com (first position within a few hours)` : ""].filter(Boolean).join(" · "));
@@ -138,7 +139,7 @@ export default function PositionsManager({ domain, country, countryName, keyword
           <span className="note">{kc ? "Local businesses: pick the city you serve. Keywords added to Keyword.com are tracked from it." : "Local businesses: pick the city you serve. Google, Maps and AI questions all use it."}</span>
         </div>
         {kc ? (
-          <p className="note">Rankings come from <b>Keyword.com</b>, which re-checks every keyword on Google daily. Keywords are kept in sync with your Keyword.com project for {domain}.</p>
+          <p className="note">Rankings come from <b>Keyword.com</b>, which re-checks every keyword on Google daily. Keywords are kept in sync with {project ? <>the Keyword.com project <b>{project}</b></> : <>your Keyword.com project for {domain}</>}.</p>
         ) : (
         <fieldset className="pt-platforms" disabled={!!busy}>
           <legend>Check rankings on</legend>

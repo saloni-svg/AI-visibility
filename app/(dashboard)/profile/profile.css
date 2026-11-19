@@ -1,0 +1,42 @@
+/* Profile: details, logs, users */
+.pf-tabs { align-self: flex-start; }
+.pf-cols { align-items: start; }
+.pf-side { display: grid; gap: 18px; }
+.pf-form { display: grid; gap: 12px; }
+.pf-field { display: grid; gap: 4px; font-size: 12.5px; color: var(--text-secondary); font-weight: 500; }
+.pf-field input, .pf-field select, .pf-filter input, .pf-filter select, .pf-table select {
+  font: inherit; font-size: 14px; height: 38px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text-primary);
+}
+.pf-field input:disabled { background: var(--surface-2); color: var(--text-secondary); }
+.pf-field small { font-weight: 400; }
+.pf-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pf-ok { color: var(--good); }
+.pf-facts { display: grid; grid-template-columns: 150px 1fr; gap: 8px 12px; margin: 0; font-size: 14px; }
+.pf-facts dt { color: var(--text-muted); }
+.pf-facts dd { margin: 0; }
+.pf-log-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.pf-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pf-filter input[type="search"] { width: 240px; }
+.pf-table td { font-size: 13.5px; vertical-align: top; }
+.pf-when { white-space: nowrap; color: var(--text-secondary); }
+.pf-detail { max-width: 460px; word-break: break-word; }
+.pf-err { color: var(--bad); max-width: 280px; }
+.pf-pages { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 20px 18px; }
+.pf-users { display: grid; gap: 18px; }
+.pf-add h3 { font-size: 15px; margin: 0 0 10px; }
+.pf-add-row { display: grid; grid-template-columns: minmax(200px, 1.6fr) minmax(150px, 1.2fr) minmax(140px, 1.2fr) minmax(120px, 0.8fr) auto; gap: 12px; align-items: end; }
+.pf-add-row .pf-field { min-width: 0; }
+.pf-add-row .pf-field input, .pf-add-row .pf-field select { width: 100%; min-width: 0; box-sizing: border-box; }
+.pf-add-btn { height: 38px; margin: 0; padding: 0 18px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
+.pf-role-help { margin: 8px 0 0; font-size: 12.5px; }
+.pf-table select { min-width: 110px; }
+.pf-row-actions { white-space: nowrap; }
+.pf-secret { padding: 12px 14px; border-radius: 10px; background: var(--good-soft, #eaf6ef); border: 1px solid var(--border); display: grid; gap: 6px; }
+.pf-secret p { margin: 0; font-size: 14px; }
+.pf-secret-box { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.pf-secret code { font-size: 13.5px; padding: 2px 6px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+.pf-row-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.pf-row-actions a { text-decoration: none; }
+.pf-danger { color: var(--bad) !important; }
+@media (max-width: 1000px) { .pf-add-row { grid-template-columns: 1fr 1fr; } .pf-add-btn { grid-column: 1 / -1; justify-self: start; } .pf-row-actions { white-space: normal; } }
+@media (max-width: 600px) { .pf-add-row, .pf-facts { grid-template-columns: 1fr; } }

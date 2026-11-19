@@ -54,16 +54,27 @@ async function kc(path: string, init: { method?: string; body?: unknown; gapMs?:
 
 const bareDomain = (d: string | null | undefined) => String(d ?? "").toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "");
 
-// The Keyword.com project tracking this domain: the one named after the domain if there is one,
-// otherwise the first whose tracked site is the domain. Creates one (named after the domain) if none.
-export async function ensureProject(domain: string): Promise<string> {
+// Keyword.com projects whose tracked site is this domain (an account can split one site
+// across several projects, e.g. "Destiny Dental ( GMB)" and "Destiny Dental ( Local)").
+// The one named after the domain comes first.
+export async function projectsForDomain(domain: string): Promise<{ id: string; keywords: number }[]> {
   const d = bareDomain(domain);
   const { data } = await kc("groups/active");
-  const groups = (data ?? []) as { id: string; attributes: { name: string; url: string | null } }[];
-  const match = groups.find((g) => g.id.toLowerCase() === d) ?? groups.find((g) => bareDomain(g.attributes.url) === d);
+  const groups = (data ?? []) as { id: string; attributes: { url: string | null; keywords_count?: { ACTIVE?: number } } }[];
+  return groups
+    .filter((g) => g.id.toLowerCase() === d || bareDomain(g.attributes.url) === d)
+    .sort((a, b) => Number(b.id.toLowerCase() === d) - Number(a.id.toLowerCase() === d))
+    .map((g) => ({ id: g.id, keywords: g.attributes.keywords_count?.ACTIVE ?? 0 }));
+}
+
+// The Keyword.com project tracking this domain: `preferred` if it tracks the domain, else the one
+// named after the domain, else the first whose tracked site is the domain. Creates one if none.
+export async function ensureProject(domain: string, preferred?: string | null): Promise<string> {
+  const projects = await projectsForDomain(domain);
+  const match = projects.find((p) => p.id === preferred) ?? projects[0];
   if (match) return match.id;
-  const created = await kc("groups", { method: "POST", body: { data: { type: "group", attributes: { category: d, currency_code: "USD" } } } });
-  return created?.data?.id ?? d;
+  const created = await kc("groups", { method: "POST", body: { data: { type: "group", attributes: { category: bareDomain(domain), currency_code: "USD" } } } });
+  return created?.data?.id ?? bareDomain(domain);
 }
 
 export type KcKeyword = {
@@ -71,6 +82,10 @@ export type KcKeyword = {
   grank: number | null; rankingurl: string | null; ms: number | null; cpc: number | null;
   serp_features: Record<string, number> | null; in_local_pack: boolean;
   search_intents: Record<string, number> | null; ranking_date: string | null;
+  // Rank when tracking started and best rank since (0 = not in the top 100). Trends are places
+  // gained (+) or lost (−) over each period, counting "not ranking" as 101; "N/A" = no data then.
+  start: number | null; best: number | null;
+  trends: { day: number | string; week: number | string; month: number | string; life: number | string } | null;
 };
 
 export async function listKeywords(project: string): Promise<KcKeyword[]> {

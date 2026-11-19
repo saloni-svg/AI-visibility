@@ -48,7 +48,7 @@ export default async function AgentPage({ searchParams }: { searchParams: Promis
     <main className="dash">
       <header className="page-header">
         <div>
-          <p className="crumbs">Home <span aria-hidden="true">›</span> Boost &amp; Monitor <span aria-hidden="true">›</span> Content agent</p>
+          <p className="crumbs">Home <span aria-hidden="true">›</span> AI Agents <span aria-hidden="true">›</span> Content agent</p>
           <h1>Content agent: <span className="muted-strong">{domain}</span></h1>
           <p className="subtitle">Checks your site, finds where AI recommends others instead of you, and drafts the content to fix it.</p>
         </div>

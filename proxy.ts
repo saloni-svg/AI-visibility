@@ -3,7 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Runs before every page: refreshes the Supabase login session and sends
 // signed-out visitors to /login. Signed-in visitors skip the login pages.
-const PUBLIC_PATHS = ["/login", "/signup", "/auth/"];
+// /share/ = read-only report links (checked by their signature in app/share/[token]).
+const PUBLIC_PATHS = ["/login", "/signup", "/auth/", "/share/"];
 
 export async function proxy(request: NextRequest) {
   const url = process.env.SUPABASE_URL;
