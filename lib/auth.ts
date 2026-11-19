@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { requireEnv } from "./env";
 
 // Supabase Auth for the dashboard. Uses the publishable key (not the service
@@ -26,11 +27,13 @@ export async function authClient() {
   });
 }
 
-export async function currentUser() {
+// The signed-in user. Checked once per request: the layout, the page and the profile all ask,
+// and each check is a round trip to Supabase Auth.
+export const currentUser = cache(async () => {
   const supabase = await authClient();
   const { data } = await supabase.auth.getUser();
   return data.user;
-}
+});
 
 // Only allow redirects to paths on this site, never to another domain.
 export function safeNext(value: unknown) {
