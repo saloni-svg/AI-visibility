@@ -1,6 +1,7 @@
 import "./app-frame-v5.css";
 import { Suspense } from "react";
 import BrandLockup from "./BrandMark";
+import NavProgress from "./NavProgress";
 import PageViewLogger from "./PageViewLogger";
 import ProfileMenu from "./ProfileMenu";
 import SideNav from "./SideNav";
@@ -27,6 +28,7 @@ export default function AppHeader({ email, name, role, children }: { email: stri
         </header>
         {children}
         <Suspense fallback={null}><PageViewLogger /></Suspense>
+        <Suspense fallback={null}><NavProgress /></Suspense>
       </div>
     </div>
   );

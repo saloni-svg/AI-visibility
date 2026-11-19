@@ -1,5 +1,5 @@
-// Shown instantly while a dashboard page loads (on the live site too): a "Loading…" pill in the
-// bottom-left corner and a placeholder of the page, so a click never looks like nothing happened.
+// Placeholder of the page while a dashboard page loads. The "Loading…" pill in the bottom-left
+// corner comes from NavProgress (in AppHeader), which shows on every link click.
 export default function Loading() {
   return (
     <>
@@ -14,10 +14,6 @@ export default function Loading() {
         </div>
         <div className="sk sk-panel" />
       </main>
-      <div className="load-pill" role="status">
-        <span className="load-spin" aria-hidden="true" />
-        Loading…
-      </div>
     </>
   );
 }
