@@ -1,37 +1,37 @@
 /* ======================================================================
    RyzeIQ theme. Loaded after globals.css, so its colour tokens win; the
    navigation rules use "html body …" so they also beat app-frame-v5.css.
-   Palette: deep teal (brand) + electric lime (highlight) on a cool mint-grey
+   Palette: cobalt blue (brand) + electric cyan (highlight) on a cool blue-grey
    canvas, Sora for headings and numbers. Deliberately no orange or purple.
    ====================================================================== */
 :root {
   --font-display: var(--font-sora), "Sora", var(--font-ui);
-  --page: #eef3f2;
+  --page: #eef2f8;
   --surface: #ffffff;
-  --surface-2: #f5f9f8;
-  --text-primary: #0b1f24;
-  --text-secondary: #43585d;
-  --text-muted: #7a8c90;
-  --grid: #e3ecea;
-  --baseline: #c3d2cf;
-  --border: #dbe6e3;
-  --wash: rgba(11, 31, 36, 0.045);
+  --surface-2: #f5f7fc;
+  --text-primary: #0b1530;
+  --text-secondary: #46526b;
+  --text-muted: #7b869c;
+  --grid: #e4e9f2;
+  --baseline: #c5cee0;
+  --border: #dce3ef;
+  --wash: rgba(11, 21, 48, 0.045);
 
-  --brand: #0d7a72;          /* deep teal */
-  --brand-hover: #0a615b;
-  --brand-ink: #0b2f33;      /* darkest brand tone: selected tabs, headings accents */
-  --lime: #a3e635;           /* electric lime highlight */
-  --lime-soft: rgba(163, 230, 53, 0.22);
-  --grad: linear-gradient(135deg, #0b4f4a 0%, #0d9488 55%, #84cc16 120%);
-  --grad-soft: linear-gradient(135deg, rgba(13, 148, 136, 0.1), rgba(132, 204, 22, 0.12));
+  --brand: #2346d8;          /* cobalt blue */
+  --brand-hover: #1b37b0;
+  --brand-ink: #0b1a4a;      /* darkest brand tone: selected tabs, headings accents */
+  --lime: #22d3ee;           /* electric cyan highlight */
+  --lime-soft: rgba(34, 211, 238, 0.16);
+  --grad: linear-gradient(135deg, #1a2b8f 0%, #2f5bff 55%, #22d3ee 120%);
+  --grad-soft: linear-gradient(135deg, rgba(47, 91, 255, 0.09), rgba(34, 211, 238, 0.12));
   --ink: var(--brand);
-  --accent: #0b7f8c;         /* links and data */
-  --accent-hover: #086570;
-  --accent-soft: rgba(11, 127, 140, 0.1);
+  --accent: #2453e6;         /* links and data */
+  --accent-hover: #1b3fb8;
+  --accent-soft: rgba(36, 83, 230, 0.1);
 
-  --you: #0d9488;
-  --other: #c3d2cf;
-  --c1: #2563eb;  /* blue */
+  --you: #2f5bff;
+  --other: #c5cee0;
+  --c1: #0ea5b7;  /* teal-cyan */
   --c2: #db2777;  /* raspberry */
   --c3: #ca8a04;  /* mustard */
   --c4: #475569;  /* slate */
@@ -39,22 +39,22 @@
   --good-soft: rgba(21, 128, 61, 0.1);
   --bad: #d1343b;
   --bad-soft: rgba(209, 52, 59, 0.09);
-  --select-bg: rgba(13, 148, 136, 0.09);
-  --select-line: #0d9488;
+  --select-bg: rgba(47, 91, 255, 0.08);
+  --select-line: #2f5bff;
 
-  --raise: 0 1px 2px rgba(11, 31, 36, 0.05), 0 4px 14px rgba(11, 47, 51, 0.06);
-  --raise-hover: 0 2px 4px rgba(11, 31, 36, 0.06), 0 10px 26px rgba(11, 47, 51, 0.1);
+  --raise: 0 1px 2px rgba(11, 31, 36, 0.05), 0 4px 14px rgba(11, 26, 74, 0.06);
+  --raise-hover: 0 2px 4px rgba(11, 31, 36, 0.06), 0 10px 26px rgba(11, 26, 74, 0.1);
   --radius: 14px;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
-    --page: #071416; --surface: #0e1f22; --surface-2: #12272a; --text-primary: #e6f2f0; --text-secondary: #a3b8b6; --text-muted: #73898a;
-    --grid: #1a3134; --baseline: #2c4649; --border: #1d363a; --wash: rgba(255, 255, 255, 0.05);
-    --brand: #2dd4bf; --brand-hover: #5eead4; --brand-ink: #ccfbf1; --ink: #2dd4bf;
-    --accent: #5ad3e0; --accent-hover: #8be2eb; --accent-soft: rgba(90, 211, 224, 0.13);
-    --you: #2dd4bf; --other: #2f4a4d; --c1: #60a5fa; --c2: #f472b6; --c3: #facc15; --c4: #94a3b8;
+    --page: #070b1a; --surface: #0e1428; --surface-2: #131b34; --text-primary: #e8edfa; --text-secondary: #a7b1cc; --text-muted: #737e99;
+    --grid: #1b2440; --baseline: #2d3a5e; --border: #1e2846; --wash: rgba(255, 255, 255, 0.05);
+    --brand: #6d8bff; --brand-hover: #93a9ff; --brand-ink: #dbe4ff; --ink: #6d8bff;
+    --accent: #7aa2ff; --accent-hover: #a3bfff; --accent-soft: rgba(122, 162, 255, 0.14);
+    --you: #6d8bff; --other: #2d3a5e; --c1: #22d3ee; --c2: #f472b6; --c3: #facc15; --c4: #94a3b8;
     --good: #4ade80; --good-soft: rgba(74, 222, 128, 0.13); --bad: #f87171; --bad-soft: rgba(248, 113, 113, 0.12);
-    --select-bg: rgba(45, 212, 191, 0.13); --select-line: #2dd4bf;
+    --select-bg: rgba(109, 139, 255, 0.14); --select-line: #6d8bff;
     --raise: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3); --raise-hover: 0 10px 26px rgba(0, 0, 0, 0.45);
   }
 }
@@ -62,8 +62,8 @@
 /* ---------- Canvas ---------- */
 body {
   background:
-    radial-gradient(1200px 520px at 100% -10%, rgba(132, 204, 22, 0.1), transparent 60%),
-    radial-gradient(900px 480px at 20% -20%, rgba(13, 148, 136, 0.12), transparent 60%),
+    radial-gradient(1200px 520px at 100% -10%, rgba(34, 211, 238, 0.12), transparent 60%),
+    radial-gradient(900px 480px at 20% -20%, rgba(47, 91, 255, 0.12), transparent 60%),
     var(--page);
   background-attachment: fixed;
 }
@@ -76,15 +76,15 @@ h1 { font-size: 23px; font-weight: 650; }
 
 /* ---------- Brand ---------- */
 .rz-lockup { display: flex; align-items: center; gap: 10px; }
-.rz-mark { flex: none; display: block; filter: drop-shadow(0 4px 10px rgba(13, 148, 136, 0.28)); }
+.rz-mark { flex: none; display: block; filter: drop-shadow(0 4px 10px rgba(47, 91, 255, 0.3)); }
 .rz-name { font-weight: 700; font-size: 18px; letter-spacing: -0.03em; color: var(--text-primary); }
 .rz-name span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-left: 1px; }
 .brand-lockup-light .rz-name, .auth-brand .rz-name { color: #fff; }
-.auth-brand .rz-name span { background: linear-gradient(90deg, #5eead4, #bef264); -webkit-background-clip: text; background-clip: text; }
+.auth-brand .rz-name span { background: linear-gradient(90deg, #93c5fd, #67e8f9); -webkit-background-clip: text; background-clip: text; }
 
 /* ---------- Left navigation: frosted panel, gradient active pill ---------- */
 html body .leftnav {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 249, 247, 0.92));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 255, 0.92));
   backdrop-filter: blur(10px);
   border-right: 1px solid var(--border);
 }
@@ -94,16 +94,16 @@ html body .leftnav-heading { text-transform: uppercase; letter-spacing: 0.08em; 
 html body .leftnav-group a { border-radius: 10px; color: var(--text-secondary); transition: background 0.15s, color 0.15s, transform 0.15s; }
 html body .leftnav-group a:hover { background: var(--grad-soft); color: var(--text-primary); transform: translateX(2px); }
 html body .leftnav-group a[aria-current="page"] {
-  background: var(--grad); color: #fff; font-weight: 650; box-shadow: 0 6px 16px rgba(13, 148, 136, 0.28); border-radius: 10px;
+  background: var(--grad); color: #fff; font-weight: 650; box-shadow: 0 6px 16px rgba(47, 91, 255, 0.3); border-radius: 10px;
 }
-html body .leftnav .soon { background: var(--lime-soft); color: #4d7c0f; }
+html body .leftnav .soon { background: var(--lime-soft); color: #0e7490; }
 
 /* ---------- Top bar: glassy ---------- */
 html body .appbar { background: rgba(255, 255, 255, 0.78); backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid var(--border); }
 html body .appbar .domain-form input { border-radius: 10px 0 0 10px; background: var(--surface); height: 38px; }
 html body .appbar .domain-form .btn-primary { border-radius: 0 10px 10px 0; height: 38px; }
 html body .appbar-new { border-radius: 10px; height: 38px; }
-.pm-avatar { background: var(--grad); box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3); }
+.pm-avatar { background: var(--grad); box-shadow: 0 4px 12px rgba(47, 91, 255, 0.32); }
 .pm-button { border-radius: 999px; }
 
 /* ---------- Page sheet and cards ---------- */
@@ -121,9 +121,9 @@ html body .appbar-new { border-radius: 10px; height: 38px; }
 /* ---------- Buttons ---------- */
 .btn-primary, .btn-dark {
   background: var(--grad); background-size: 140% 140%; color: #fff; border: 0; border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.26); transition: transform 0.15s, box-shadow 0.15s, background-position 0.3s;
+  box-shadow: 0 6px 16px rgba(47, 91, 255, 0.28); transition: transform 0.15s, box-shadow 0.15s, background-position 0.3s;
 }
-.btn-primary:hover, .btn-dark:hover { background: var(--grad); background-position: 100% 0; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(13, 148, 136, 0.32); }
+.btn-primary:hover, .btn-dark:hover { background: var(--grad); background-position: 100% 0; transform: translateY(-1px); box-shadow: 0 10px 22px rgba(47, 91, 255, 0.34); }
 .btn-primary:disabled, .btn-dark:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 .btn-secondary { border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
 .btn-secondary:hover { border-color: var(--select-line); background: var(--select-bg); box-shadow: none; }
@@ -131,40 +131,39 @@ html body .appbar-new { border-radius: 10px; height: 38px; }
 /* ---------- Tabs and segmented controls: ink pill ---------- */
 .seg, .segmented, .cr-chart-tabs { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 4px; }
 .seg button[aria-pressed="true"], .segmented a[aria-current="true"], .cr-chart-tabs button[aria-selected="true"] {
-  background: var(--brand-ink); color: #fff; box-shadow: 0 4px 12px rgba(11, 47, 51, 0.22); border-radius: 8px;
+  background: var(--brand-ink); color: #fff; box-shadow: 0 4px 12px rgba(11, 26, 74, 0.24); border-radius: 8px;
 }
 .seg button[aria-pressed="true"] span { color: rgba(255, 255, 255, 0.72); }
 
 /* ---------- Pills, inputs, tables ---------- */
 .pill { border-radius: 999px; font-weight: 600; }
-.pill-strong, .pill-unique { background: var(--lime-soft); color: #3f6212; }
+.pill-strong, .pill-unique { background: var(--good-soft); color: var(--good); }
 input, select, textarea { border-radius: 10px; }
 input:focus, select:focus, textarea:focus { outline: none; border-color: var(--select-line) !important; box-shadow: 0 0 0 3px var(--select-bg); }
 thead th { background: var(--surface-2); }
-tbody tr:hover td, .cr-row:not(.cr-head):hover { background: rgba(13, 148, 136, 0.045); }
+tbody tr:hover td, .cr-row:not(.cr-head):hover { background: rgba(47, 91, 255, 0.045); }
 .progress span { background: var(--grad); }
 :focus-visible { outline-color: var(--brand); }
 
 /* ---------- Sign-in screen ---------- */
-html body .auth-brand { background: radial-gradient(600px 400px at 0% 0%, rgba(132, 204, 22, 0.25), transparent 60%), linear-gradient(160deg, #062a2b 0%, #0b4f4a 55%, #0d7a72 100%); color: #fff; border-left: 0; }
+html body .auth-brand { background: radial-gradient(600px 400px at 100% 0%, rgba(34, 211, 238, 0.28), transparent 60%), linear-gradient(160deg, #070f33 0%, #13248a 55%, #2346d8 100%); color: #fff; border-left: 0; }
 html body .auth-brand .brand-tag { color: rgba(255, 255, 255, 0.65); }
 html body .auth-pitch h2 { color: #fff; font-family: var(--font-display); }
 html body .auth-pitch p { color: rgba(255, 255, 255, 0.8); }
-html body .auth-pitch li { color: #ecfdf5; }
-html body .auth-pitch .check { background: rgba(190, 242, 100, 0.18); color: #bef264; }
+html body .auth-pitch li { color: #eef2ff; }
+html body .auth-pitch .check { background: rgba(103, 232, 249, 0.18); color: #67e8f9; }
 html body .auth-preview { border: 0; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3); border-radius: 14px; }
-html body .auth-shell { background: radial-gradient(700px 400px at 0% 100%, rgba(13, 148, 136, 0.08), transparent 60%), var(--surface); }
+html body .auth-shell { background: radial-gradient(700px 400px at 0% 100%, rgba(47, 91, 255, 0.08), transparent 60%), var(--surface); }
 
 /* ---------- Shared report bar ---------- */
 .shared-bar .rz-name { font-size: 16px; }
 
 @media (prefers-color-scheme: dark) {
-  html body .leftnav { background: linear-gradient(180deg, rgba(14, 31, 34, 0.95), rgba(7, 20, 22, 0.95)); }
-  html body .appbar { background: rgba(14, 31, 34, 0.8); }
+  html body .leftnav { background: linear-gradient(180deg, rgba(14, 20, 40, 0.95), rgba(7, 11, 26, 0.95)); }
+  html body .appbar { background: rgba(14, 20, 40, 0.8); }
   .stat-value { color: var(--text-primary); }
-  .pill-strong, .pill-unique { color: #bef264; }
-  .seg button[aria-pressed="true"], .segmented a[aria-current="true"], .cr-chart-tabs button[aria-selected="true"] { background: var(--brand); color: #04201d; }
-  html body .leftnav .soon { color: #bef264; }
+  .seg button[aria-pressed="true"], .segmented a[aria-current="true"], .cr-chart-tabs button[aria-selected="true"] { background: var(--brand); color: #060b22; }
+  html body .leftnav .soon { color: #67e8f9; }
 }
 @media print {
   body { background: #fff !important; }
