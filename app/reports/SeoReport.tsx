@@ -107,7 +107,8 @@ export default async function SeoReport({ domain, params, shared = false }: { do
         <>
           {d && <Kpis d={d} />}
           {d?.problems?.length ? <p className="note seo-problems">Missing data: {d.problems.join(" · ")}</p> : null}
-          <SeoPlanView domain={domain} planId={plan.id} plan={plan.plan} shared={shared} />
+          {/* key: a new plan replaces the list instead of keeping the previous plan's actions */}
+          <SeoPlanView key={plan.id} domain={domain} planId={plan.id} plan={plan.plan} shared={shared} />
           {d?.opportunities && <Evidence d={d} />}
         </>
       )}
