@@ -6,31 +6,38 @@ import type { ShareKind } from "@/lib/share";
 import Icon from "./Icon";
 
 // "Export PDF" and "Share link" for a report page.
-// PDF: the browser's print dialog ("Save as PDF"), with the app's menus and controls left out and
-// the page title used as the file name. `target` = id of one section to print on its own.
+// PDF: a designed report document (cover page, sections, charts, tables; lib/pdf), built on the
+// server with the filters now on screen and downloaded as a .pdf file. On a shared page it comes
+// from the share link. `title` is only a fallback file name.
 // Share link: a read-only link to this report, with the filters now on screen, that opens
 // without logging in for 30 days. Hidden on a shared page (`shared`).
-export default function ReportActions({ kind, domain, title, target, shared = false, query: extra }: {
+export default function ReportActions({ kind, domain, title, shared = false, query: extra }: {
   kind: ShareKind; domain: string; title: string; target?: string; shared?: boolean; query?: Record<string, string>;
 }) {
   const [link, setLink] = useState<{ url: string; expires: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
 
-  function exportPdf() {
-    const before = document.title;
-    const el = target ? document.getElementById(target) : null;
-    document.title = title.replace(/[\\/:*?"<>|]+/g, "-");
-    if (el) { document.body.classList.add("print-scope"); el.classList.add("print-target"); }
-    const done = () => {
-      document.title = before;
-      document.body.classList.remove("print-scope");
-      el?.classList.remove("print-target");
-      window.removeEventListener("afterprint", done);
-    };
-    window.addEventListener("afterprint", done);
-    window.print();
+  async function exportPdf() {
+    setPdfBusy(true);
+    setError("");
+    try {
+      const query = { ...Object.fromEntries(new URL(window.location.href).searchParams), ...extra, kind, domain };
+      const url = shared ? `${window.location.pathname.replace(/\/$/, "")}/pdf` : `/report/pdf?${new URLSearchParams(query)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error((await res.text()) || `HTTP ${res.status}`);
+      const blob = await res.blob();
+      const name = /filename="([^"]+)"/.exec(res.headers.get("Content-Disposition") ?? "")?.[1] ?? `${title.replace(/[\\/:*?"<>|]+/g, "-")}.pdf`;
+      const href = URL.createObjectURL(blob);
+      Object.assign(document.createElement("a"), { href, download: name }).click();
+      setTimeout(() => URL.revokeObjectURL(href), 10_000);
+    } catch (e) {
+      setError((e as Error).message.slice(0, 300));
+    } finally {
+      setPdfBusy(false);
+    }
   }
 
   async function copy(url: string) {
@@ -53,8 +60,8 @@ export default function ReportActions({ kind, domain, title, target, shared = fa
   return (
     <div className="report-actions no-print">
       <div className="report-actions-row">
-        <button type="button" className="btn-secondary btn-small" onClick={exportPdf}>
-          <Icon name="download" size={13} /> Export PDF
+        <button type="button" className="btn-secondary btn-small" onClick={exportPdf} disabled={pdfBusy}>
+          <Icon name="download" size={13} /> {pdfBusy ? "Creating PDF…" : "Export PDF"}
         </button>
         {!shared && (
           <button type="button" className="btn-secondary btn-small" onClick={share} disabled={busy}>
