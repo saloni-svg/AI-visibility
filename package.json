@@ -16,6 +16,7 @@
     "track:prompts": "tsx scripts/track-prompts.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
     "@fontsource-variable/schibsted-grotesk": "^5.3.0",
     "@perplexity-ai/perplexity_ai": "^0.38.8",
     "@supabase/ssr": "^0.12.7",

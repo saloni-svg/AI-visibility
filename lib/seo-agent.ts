@@ -3,6 +3,7 @@ import { clearCache } from "./cache";
 import { loadCompetitorReport } from "./competitors";
 import { config, requireEnv } from "./env";
 import { postJson } from "./http";
+import { claudeJson, hasClaude, modelName, type ClaudeUsage } from "./claude";
 import { hasKeywordCom } from "./keywordcom";
 import { loadRankReport } from "./rank-report";
 import { db } from "./supabase";
@@ -64,7 +65,11 @@ export type PlanAction = {
   draft: { title: string; meta_description: string; outline: string[] };
   status?: "todo" | "done" | "dismissed";
 };
-export type SeoPlan = { summary: string; priorities: string[]; progress: string; actions: PlanAction[] };
+export type SeoPlan = {
+  summary: string; priorities: string[]; progress: string; actions: PlanAction[];
+  writtenBy?: string; // e.g. "Claude Opus 5.5"
+  usage?: ClaudeUsage; // tokens and cost of writing it (Claude runs)
+};
 
 const now = () => new Date().toISOString();
 const day = (d: Date) => d.toISOString().slice(0, 10);
@@ -452,7 +457,7 @@ export async function writePlan(brandId: string, brand: { name: string; domain: 
     periods: data.periods,
     searchConsole: g ? {
       totals: g.totals, brandedLast28Days: g.branded, monthly: g.monthly,
-      topQueries: g.queries.slice(0, 40).map((q) => ({ query: q.query, page: q.page, clicks: q.clicks, impressions: q.impressions, position: q.position })),
+      topQueries: g.queries.slice(0, hasClaude() ? 200 : 40).map((q) => ({ query: q.query, page: q.page, clicks: q.clicks, impressions: q.impressions, position: q.position })),
     } : "not connected",
     ga4: data.ga4 ? { totals: data.ga4.totals, organicOnly: data.ga4.organicOnly, topLandingPages: data.ga4.pages.slice(0, 25) } : "not connected",
     opportunities: data.opportunities,
@@ -465,19 +470,26 @@ export async function writePlan(brandId: string, brand: { name: string; domain: 
   };
   const system = SYSTEM.replaceAll("{BRAND}", brand.name).replaceAll("{DOMAIN}", brand.domain)
     .replace("{FOCUS}", focus ? `\n\nThe user asked you to focus on: ${focus}` : "");
-  const raw = await postJson(
-    "https://api.openai.com/v1/chat/completions",
-    { Authorization: `Bearer ${requireEnv("OPENAI_API_KEY")}` },
-    {
-      model: config.models.agent,
-      temperature: 0.3,
-      messages: [{ role: "system", content: system }, { role: "user", content: JSON.stringify(input).slice(0, 120_000) }],
-      response_format: { type: "json_schema", json_schema: { name: "seo_plan", strict: true, schema: PLAN_SCHEMA } },
-    },
-    2,
-    240_000,
-  );
-  const plan = JSON.parse(raw.choices[0].message.content) as SeoPlan;
+  // Claude writes the plan (lib/claude.ts). OpenAI only as a backup when no Anthropic key is set.
+  let plan: SeoPlan;
+  if (hasClaude()) {
+    const { data: written, usage } = await claudeJson<SeoPlan>({ system, input: JSON.stringify(input), schema: PLAN_SCHEMA, effort: "high" });
+    plan = { ...written, writtenBy: modelName(usage.model), usage };
+  } else {
+    const raw = await postJson(
+      "https://api.openai.com/v1/chat/completions",
+      { Authorization: `Bearer ${requireEnv("OPENAI_API_KEY")}` },
+      {
+        model: config.models.agent,
+        temperature: 0.3,
+        messages: [{ role: "system", content: system }, { role: "user", content: JSON.stringify(input).slice(0, 120_000) }],
+        response_format: { type: "json_schema", json_schema: { name: "seo_plan", strict: true, schema: PLAN_SCHEMA } },
+      },
+      2,
+      240_000,
+    );
+    plan = { ...(JSON.parse(raw.choices[0].message.content) as SeoPlan), writtenBy: config.models.agent };
+  }
   plan.actions = plan.actions.map((a, i) => ({ ...a, id: `a${i + 1}`, status: "todo" }));
   return plan;
 }

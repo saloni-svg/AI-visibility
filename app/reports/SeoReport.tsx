@@ -68,7 +68,7 @@ export default async function SeoReport({ domain, params, shared = false }: { do
           <p className="crumbs">Home <span aria-hidden="true">›</span> AI Agents <span aria-hidden="true">›</span> SEO agent</p>
           <h1>SEO plan: <span className="muted-strong">{domain}</span></h1>
           <p className="subtitle">Real Search Console and GA4 data (through Windsor.ai), your rankings, site audit and AI visibility, turned into a prioritised 90-day plan.</p>
-          {plan && <p className="note shared-filters">Plan of {fmtDate(plan.created_at)}{plan.focus ? ` · focus: ${plan.focus}` : ""}{d?.periods ? ` · data ${fmtDate(d.periods.cur[0])} – ${fmtDate(d.periods.cur[1])}` : ""}</p>}
+          {plan && <p className="note shared-filters">Plan of {fmtDate(plan.created_at)}{plan.focus ? ` · focus: ${plan.focus}` : ""}{d?.periods ? ` · data ${fmtDate(d.periods.cur[0])} – ${fmtDate(d.periods.cur[1])}` : ""}{plan.plan.writtenBy ? ` · written by ${plan.plan.writtenBy}` : ""}</p>}
         </div>
         {plan && (
           <div className="header-actions">
