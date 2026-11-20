@@ -48,3 +48,7 @@
 .seo-bar-val { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; }
 .seo-bar-label { font-size: 11px; color: var(--text-muted); }
 @media (max-width: 700px) { .seo-action-head { flex-direction: column; } .seo-bar-val { display: none; } }
+/* SEO tables: shown in full with the page (no inner scroll, no pinned header row). */
+.seo-table-box { overflow-x: auto; overflow-y: hidden; max-height: none; padding-top: 4px; }
+.seo-table-box thead th { position: static; box-shadow: inset 0 -1px 0 var(--border); }
+.seo-table td.num, .seo-table th.num { font-variant-numeric: normal; }

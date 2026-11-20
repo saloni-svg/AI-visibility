@@ -208,7 +208,7 @@ function Table({ title, note, head, rows }: { title: string; note: string; head:
   return (
     <section className="card panel">
       <div className="panel-head"><div className="panel-title"><h2>{title}</h2><p className="note">{note}</p></div></div>
-      <div className="panel-body table-wrap">
+      <div className="panel-body seo-table-box">
         <table className="seo-table">
           <thead><tr>{head.map((h, i) => <th key={h} className={i ? "num" : undefined}>{h}</th>)}</tr></thead>
           <tbody>{rows.map((r, i) => <tr key={i}>{r.map((c, j) => <td key={j} className={j ? "num" : undefined}>{c}</td>)}</tr>)}</tbody>
