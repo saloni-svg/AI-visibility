@@ -213,3 +213,10 @@ html body .cr-stat:first-child { padding-left: 0 !important; border-left: 0 !imp
 html body .cr-stat-value { margin-top: auto; }
 @media (max-width: 700px) { html body .cr-stats { flex-wrap: wrap; row-gap: 14px; } html body .cr-stat { flex-basis: 45%; } }
 html body .cr-stat-name { font-size: 13.5px; overflow-wrap: anywhere; }
+
+/* Scrolling tables inside a panel: no gap above the pinned header row, so rows can't show
+   through above it. Short SEO tables don't scroll on their own at all. */
+html body .panel-body.table-wrap { padding-top: 0; margin-top: 0; }
+html body .panel-body.table-wrap thead th { top: 0; z-index: 3; }
+html body .panel-body.table-wrap:has(.seo-table) { max-height: none; overflow-y: visible; overflow-x: auto; }
+.seo-table td.num, .seo-table th.num { font-family: var(--font-ui); font-variant-numeric: tabular-nums; }
