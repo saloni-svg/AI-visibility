@@ -130,7 +130,7 @@ export default function CompetitorTable({
       </span>
     );
   };
-  const grid = { gridTemplateColumns: `minmax(240px, 2.2fr) repeat(${entities.length}, minmax(76px, 1fr)) 150px 120px 190px` };
+  const grid = { gridTemplateColumns: `minmax(220px, 2.2fr) repeat(${entities.length}, minmax(72px, 1fr)) 140px 110px max-content` };
   const promptGrid = { gridTemplateColumns: `minmax(280px, 2.6fr) repeat(${entities.length}, minmax(76px, 1fr)) 150px 110px 110px` };
   const siteGrid = { gridTemplateColumns: `minmax(240px, 2.2fr) 130px repeat(${entities.length}, minmax(76px, 1fr)) 140px` };
 
@@ -227,7 +227,7 @@ export default function CompetitorTable({
                       <span className="cr-act">
                         <button type="button" className={`cr-monitor ${t.monitoring ? "btn-dark btn-small" : "btn-secondary btn-small"}`} disabled={pending && busyTopic === t.name}
                           onClick={() => monitor(t)} title={t.monitoring ? "These questions are checked in every run. Click to pause them." : "Paused: click to check these questions again."}>
-                          <Icon name="search" size={14} /> {t.monitoring ? "Monitoring" : "Monitor all prompts"}
+                          <Icon name="search" size={14} /> {t.monitoring ? "Monitoring" : "Monitor"}
                         </button>
                       </span>
                     </div>

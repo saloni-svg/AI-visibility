@@ -66,7 +66,7 @@ export default function TrendChart({ series, points, unit = "percent" }: { serie
           </g>
         ))}
         {points.map((p, i) =>
-          i % labelEvery === 0 || i === points.length - 1 ? (
+          (i % labelEvery === 0 && points.length - 1 - i >= Math.ceil(labelEvery * 0.75)) || i === points.length - 1 ? (
             <text key={i} className="axis-text" x={x(i)} y={HEIGHT - 8} textAnchor={points.length === 1 ? "middle" : i === 0 ? "start" : i === points.length - 1 ? "end" : "middle"}>
               {p.label}
             </text>
