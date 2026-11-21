@@ -28,7 +28,7 @@ export const config = {
   reuseResultsDays: envInt("REUSE_RESULTS_DAYS", 7),
   concurrency: envInt("CONCURRENCY", 4),
   // Content agent: maximum model turns per run (each turn can call several tools).
-  agentMaxSteps: envInt("AGENT_MAX_STEPS", 14),
+  agentMaxSteps: envInt("AGENT_MAX_STEPS", 18),
   // Agent API preset: fast | low | medium | high | xhigh (deeper = slower and pricier)
   perplexityPreset: process.env.PERPLEXITY_PRESET || "fast",
   models: {
