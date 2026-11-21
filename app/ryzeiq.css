@@ -84,7 +84,7 @@ h1 { font-size: 23px; font-weight: 650; }
 
 /* ---------- Left navigation: dark navy panel, collapsible topics ---------- */
 html body .leftnav {
-  background: radial-gradient(420px 260px at 0% 0%, rgba(47, 91, 255, 0.28), transparent 70%), linear-gradient(180deg, #0b1438 0%, #070d26 100%);
+  background: radial-gradient(420px 260px at 0% 0%, rgba(96, 130, 255, 0.3), transparent 70%), linear-gradient(180deg, #1e3170 0%, #172760 100%);
   border-right: 0; color: #c9d3ee; gap: 26px; padding: 20px 14px 28px;
 }
 html body .leftnav .brand-lockup { padding: 2px 8px 6px; }
