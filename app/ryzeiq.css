@@ -320,3 +320,5 @@ html body .leftnav-topic:hover { background: #22357a; }
 .appbar-page b { color: var(--text-primary); font-weight: 650; }
 /* Prompt research: less space above the hero card */
 html body .dash.pr-page { padding-top: 18px; }
+/* All pages: one small gap under the top bar (was a 20px margin + 24px padding) */
+html body .dash { margin-top: 0; padding-top: 20px; }
