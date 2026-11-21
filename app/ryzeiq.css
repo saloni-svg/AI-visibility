@@ -301,3 +301,16 @@ html body .page-header > div:first-child .crumbs { flex-basis: 100%; margin-bott
 html body .leftnav .rz-name span { background: linear-gradient(90deg, #7aa2ff, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .seo-summary p.is-clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 @media print { .seo-summary p.is-clamped { display: block; -webkit-line-clamp: unset; } }
+
+/* Sidebar: crisp, solid colours (no glow, no see-through text) */
+html body .leftnav { background: #1b2c66; border-right: 1px solid #2a3d80; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html body .leftnav .brand-tag { color: #aebbe0; }
+html body .leftnav-topic { color: #e3e9fb; }
+html body .leftnav-topic-icon { background: #26397a; color: #a9bcff; }
+html body .leftnav-caret { color: #8fa0d0; }
+html body .leftnav-sub ul { border-left-color: #34478a; }
+html body .leftnav-group a { color: #cfd8f5; }
+html body .leftnav-group a:hover { background: #24377a; color: #fff; }
+html body .leftnav-group a[aria-current="page"] { background: #2d48a8; color: #fff; }
+html body .leftnav-disabled { color: #8494c4; }
+html body .leftnav-topic:hover { background: #22357a; }
