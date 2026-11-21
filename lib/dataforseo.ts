@@ -8,16 +8,22 @@ export const hasDataForSeo = () => !!(process.env.DATAFORSEO_LOGIN && process.en
 
 // Short timeout and a single retry: DataForSEO must never hold up a check.
 // Temporary errors on DataForSEO's side (status 5xxxx) are retried once more.
+// One DataForSEO request. Their temporary search-engine errors (status 50000+, e.g. "Internal SE
+// Server Error" when Google results can't be fetched right now) usually clear within seconds, so
+// they're retried up to 4 times with growing, slightly random waits (3s, 7s, 15s, 25s).
 export async function dataForSeo(path: string, tasks: unknown[], timeoutMs = 60_000, retry = true): Promise<any> {
   const auth = Buffer.from(`${requireEnv("DATAFORSEO_LOGIN")}:${requireEnv("DATAFORSEO_PASSWORD")}`).toString("base64");
-  const raw = await postJson(`https://api.dataforseo.com/v3/${path}`, { Authorization: `Basic ${auth}` }, tasks, 1, timeoutMs);
-  const task = raw?.tasks?.[0];
-  if (task && task.status_code >= 50000 && retry) {
-    await new Promise((r) => setTimeout(r, 2000));
-    return dataForSeo(path, tasks, timeoutMs, false);
+  const waits = retry ? [3000, 7000, 15000, 25000] : [];
+  for (let attempt = 0; ; attempt++) {
+    const raw = await postJson(`https://api.dataforseo.com/v3/${path}`, { Authorization: `Basic ${auth}` }, tasks, 1, timeoutMs);
+    const task = raw?.tasks?.[0];
+    if (task && task.status_code >= 50000 && attempt < waits.length) {
+      await new Promise((r) => setTimeout(r, waits[attempt] + Math.random() * 1500));
+      continue;
+    }
+    if (!task || task.status_code >= 40000) throw new Error(`DataForSEO: ${task?.status_message ?? raw?.status_message ?? "no result"}`);
+    return raw;
   }
-  if (!task || task.status_code >= 40000) throw new Error(`DataForSEO: ${task?.status_message ?? raw?.status_message ?? "no result"}`);
-  return raw;
 }
 
 export type Volume = { keyword: string; volume: number | null; monthly: { month: string; volume: number }[]; source: "ai" | "google" };
