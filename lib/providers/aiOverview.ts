@@ -11,17 +11,18 @@ export const aiOverview: Provider = {
   model: "google-serp",
   requiredEnv: ["DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD"],
 
-  call(prompt, country) {
+  // DataForSEO sometimes can't fetch Google ("Internal SE Server Error"), more often with the
+  // asynchronous AI Overview option. dataForSeo() already retries; if it still fails, ask once
+  // more without that option (Google often includes the AI Overview anyway).
+  async call(prompt, country) {
     const code = isCountry(country) ? country : "US";
-    return dataForSeo("serp/google/organic/live/advanced", [
-      {
-        keyword: prompt,
-        location_code: COUNTRIES[code].locationCode,
-        language_code: "en",
-        device: "desktop",
-        load_async_ai_overview: true,
-      },
-    ]);
+    const task = { keyword: prompt, location_code: COUNTRIES[code].locationCode, language_code: "en", device: "desktop" };
+    try {
+      return await dataForSeo("serp/google/organic/live/advanced", [{ ...task, load_async_ai_overview: true }], 90_000);
+    } catch (err) {
+      if (!/Internal SE Server Error/i.test((err as Error).message)) throw err;
+      return dataForSeo("serp/google/organic/live/advanced", [task], 90_000);
+    }
   },
 
   extract(raw) {
