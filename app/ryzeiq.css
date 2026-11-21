@@ -322,3 +322,17 @@ html body .leftnav-topic:hover { background: #22357a; }
 html body .dash.pr-page { padding-top: 18px; }
 /* All pages: one small gap under the top bar (was a 20px margin + 24px padding) */
 html body .dash { margin-top: 0; padding-top: 20px; }
+
+/* Profile button at the bottom of the left sidebar; its menu opens upwards */
+html body .leftnav-profile { margin-top: auto; padding-top: 14px; border-top: 1px solid #2a3d80; }
+html body .leftnav-profile .pm { position: relative; }
+html body .leftnav-profile .pm-button { width: 100%; gap: 10px; padding: 7px 10px 7px 7px; border-radius: 12px; border: 1px solid #2f4388; background: #22357a; color: #e3e9fb; text-align: left; }
+html body .leftnav-profile .pm-button:hover, html body .leftnav-profile .pm-button[aria-expanded="true"] { background: #2a3f8c; border-color: #4060c0; box-shadow: none; }
+.pm-side-text { display: none; }
+html body .leftnav-profile .pm-side-text { display: grid; flex: 1; min-width: 0; line-height: 1.25; }
+html body .leftnav-profile .pm-side-text b { font-size: 13.5px; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body .leftnav-profile .pm-side-text span { font-size: 12px; color: #aebbe0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body .leftnav-profile .pm-caret { color: #aebbe0; transform: rotate(180deg); }
+html body .leftnav-profile .pm-menu { top: auto; bottom: calc(100% + 8px); left: 0; right: auto; width: 100%; color: var(--text-primary); }
+html body .leftnav-profile .pm-email { max-width: 150px; }
+@media (max-width: 1000px) { html body .leftnav-profile { margin-top: 0; border-top: 0; padding-top: 0; } html body .leftnav-profile .pm-menu { bottom: auto; top: calc(100% + 8px); } }

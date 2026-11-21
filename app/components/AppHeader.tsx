@@ -16,13 +16,15 @@ export default function AppHeader({ email, name, role, children }: { email: stri
         <Suspense fallback={<nav aria-label="Main" className="leftnav-groups" />}>
           <SideNav />
         </Suspense>
+        <div className="leftnav-profile">
+          <ProfileMenu email={email} name={name} role={role} />
+        </div>
       </aside>
       <div className="app-body">
         <header className="appbar">
           <div className="appbar-row">
             <div className="appbar-tools">
               <Suspense fallback={null}><TopTools /></Suspense>
-              <ProfileMenu email={email} name={name} role={role} />
             </div>
           </div>
         </header>

@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { signOut } from "../(auth)/actions";
 import Icon from "./Icon";
 
-// Top-right profile button: a round avatar (initials). Click it to see who's signed in and open
-// the profile, activity log, query log, users (owner) or sign out.
+// Profile button at the bottom of the left sidebar: avatar, name and role. Click it to see who's
+// signed in and open the profile, activity log, query log, users (owner) or sign out.
 export default function ProfileMenu({ email, name, role }: { email: string; name?: string | null; role?: string | null }) {
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -29,6 +29,10 @@ export default function ProfileMenu({ email, name, role }: { email: string; name
     <div className="pm" ref={box}>
       <button type="button" className="pm-button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)} title={email}>
         <span className="pm-avatar" aria-hidden="true">{initials}</span>
+        <span className="pm-side-text" aria-hidden="true">
+          <b>{name?.trim() || email.split("@")[0]}</b>
+          <span>{roleText ?? email}</span>
+        </span>
         <span className="sr-only">Profile menu for {email}</span>
         <svg className="pm-caret" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
       </button>
