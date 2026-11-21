@@ -82,21 +82,40 @@ h1 { font-size: 23px; font-weight: 650; }
 .brand-lockup-light .rz-name, .auth-brand .rz-name { color: #fff; }
 .auth-brand .rz-name span { background: linear-gradient(90deg, #93c5fd, #67e8f9); -webkit-background-clip: text; background-clip: text; }
 
-/* ---------- Left navigation: frosted panel, gradient active pill ---------- */
+/* ---------- Left navigation: dark navy panel, collapsible topics ---------- */
 html body .leftnav {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 245, 255, 0.92));
-  backdrop-filter: blur(10px);
-  border-right: 1px solid var(--border);
+  background: radial-gradient(420px 260px at 0% 0%, rgba(47, 91, 255, 0.28), transparent 70%), linear-gradient(180deg, #0b1438 0%, #070d26 100%);
+  border-right: 0; color: #c9d3ee; gap: 26px; padding: 20px 14px 28px;
 }
 html body .leftnav .brand-lockup { padding: 2px 8px 6px; }
-html body .leftnav .brand-name { font-size: 18px; }
-html body .leftnav-heading { text-transform: uppercase; letter-spacing: 0.08em; font-size: 10.5px; font-weight: 700; color: var(--text-muted); }
-html body .leftnav-group a { border-radius: 10px; color: var(--text-secondary); transition: background 0.15s, color 0.15s, transform 0.15s; }
-html body .leftnav-group a:hover { background: var(--grad-soft); color: var(--text-primary); transform: translateX(2px); }
-html body .leftnav-group a[aria-current="page"] {
-  background: var(--grad); color: #fff; font-weight: 650; box-shadow: 0 6px 16px rgba(47, 91, 255, 0.3); border-radius: 10px;
+html body .leftnav .brand-name { font-size: 18px; color: #fff; }
+html body .leftnav .brand-tag { color: rgba(201, 211, 238, 0.6); }
+html body .leftnav-groups { display: grid; gap: 4px; }
+html body .leftnav-topic {
+  width: 100%; display: flex; align-items: center; gap: 11px; padding: 10px 10px; border: 0; border-radius: 10px;
+  background: transparent; color: #c9d3ee; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left;
+  transition: background 0.15s, color 0.15s;
 }
-html body .leftnav .soon { background: var(--lime-soft); color: #0e7490; }
+html body .leftnav-topic:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+html body .leftnav-topic-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: rgba(255, 255, 255, 0.06); color: #93a9ff; flex: none; }
+html body .leftnav-group.has-current .leftnav-topic { color: #fff; }
+html body .leftnav-group.has-current .leftnav-topic-icon { background: var(--grad); color: #fff; box-shadow: 0 6px 14px rgba(47, 91, 255, 0.35); }
+html body .leftnav-topic-label { flex: 1; min-width: 0; }
+html body .leftnav-caret { display: grid; color: rgba(201, 211, 238, 0.55); transition: transform 0.2s; }
+html body .leftnav-group.is-open .leftnav-caret { transform: rotate(90deg); }
+html body .leftnav-sub ul { display: grid; gap: 2px; margin: 2px 0 8px 25px; padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, 0.1); }
+html body .leftnav-group a, html body .leftnav-disabled { padding: 7px 10px; font-size: 13.5px; border-radius: 8px; }
+html body .leftnav-group a { color: rgba(201, 211, 238, 0.82); transition: background 0.15s, color 0.15s; }
+html body .leftnav-group a:hover { background: rgba(255, 255, 255, 0.07); color: #fff; transform: none; }
+html body .leftnav-group a[aria-current="page"] { background: rgba(47, 91, 255, 0.28); color: #fff; font-weight: 650; box-shadow: inset 3px 0 0 var(--lime); border-radius: 3px 8px 8px 3px; }
+html body .leftnav-disabled { color: rgba(201, 211, 238, 0.4); }
+html body .leftnav .soon { background: rgba(34, 211, 238, 0.14); color: #67e8f9; }
+html body .leftnav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); }
+html body .leftnav .nav-pending.is-pending { border-color: rgba(255, 255, 255, 0.25); border-top-color: #fff; }
+@media (max-width: 1000px) {
+  html body .leftnav-groups { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+  html body .leftnav-group { flex: 1 1 200px; }
+}
 
 /* ---------- Top bar: glassy ---------- */
 html body .appbar { background: rgba(255, 255, 255, 0.78); backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid var(--border); }
@@ -159,11 +178,10 @@ html body .auth-shell { background: radial-gradient(700px 400px at 0% 100%, rgba
 .shared-bar .rz-name { font-size: 16px; }
 
 @media (prefers-color-scheme: dark) {
-  html body .leftnav { background: linear-gradient(180deg, rgba(14, 20, 40, 0.95), rgba(7, 11, 26, 0.95)); }
+  html body .leftnav { background: linear-gradient(180deg, #0a1030 0%, #050918 100%); }
   html body .appbar { background: rgba(14, 20, 40, 0.8); }
   .stat-value { color: var(--text-primary); }
   .seg button[aria-pressed="true"], .segmented a[aria-current="true"], .cr-chart-tabs button[aria-selected="true"] { background: var(--brand); color: #060b22; }
-  html body .leftnav .soon { color: #67e8f9; }
 }
 @media print {
   body { background: #fff !important; }
@@ -220,3 +238,66 @@ html body .panel-body.table-wrap { padding-top: 0; margin-top: 0; }
 html body .panel-body.table-wrap thead th { top: 0; z-index: 3; }
 html body .panel-body.table-wrap:has(.seo-table) { max-height: none; overflow-y: visible; overflow-x: auto; }
 .seo-table td.num, .seo-table th.num { font-family: var(--font-ui); font-variant-numeric: tabular-nums; }
+
+/* ---------- Visibility overview: Topics & sources table fits its card (no inner scrollbars) ---------- */
+html body .ov-topic-table .table-scroll, html body .ov-topic-table .table-wrap { max-height: none; overflow: visible; margin: 0; }
+html body .ov-topic-table .topic-grid {
+  min-width: 0; gap: 12px; padding: 13px 18px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.5fr) 74px 116px 64px;
+}
+html body .ov-topic-table .topic-head { position: static; }
+html body .ov-topic-table thead th { position: static; }
+.topic-brands { display: flex; flex-wrap: wrap; gap: 4px; }
+.brand-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+html body .ov-topic-table .intent-bar { width: 100%; }
+html body .ov-topic-table .prompt-rows { min-width: 0; margin: 0 16px 16px; }
+html body .ov-topic-table .prompt-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 2.2fr) 120px 52px 56px; }
+html body .ov-topic-table .prompt-text, html body .ov-topic-table .answer-snippet { overflow-wrap: anywhere; }
+.show-more { display: block; width: 100%; padding: 11px; border: 0; border-top: 1px solid var(--grid); background: var(--surface-2); color: var(--accent); font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.show-more:hover { background: var(--select-bg); }
+@media (max-width: 760px) {
+  html body .ov-topic-table .table-scroll { overflow-x: auto; }
+  html body .ov-topic-table .topic-grid { min-width: 620px; }
+  html body .ov-topic-table .prompt-rows { min-width: 640px; }
+}
+
+/* Keyword overview SERP table: 10 rows per page, so no inner scroll box (its scrollbar was cut off) */
+html body .kw-serp-wrap { max-height: none; overflow-y: visible; overflow-x: auto; margin: 0; }
+html body .kw-serp-wrap thead th { position: static; }
+html body .kw-serp-table { min-width: 760px; }
+
+/* ---------- Mini charts (MiniCharts.tsx) ---------- */
+.glance { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr); gap: 28px; padding: 20px 22px; align-items: start; }
+.glance h3 { margin: 0 0 12px; font-size: 13px; font-weight: 650; color: var(--text-secondary); }
+.glance > div { min-width: 0; }
+@media (max-width: 900px) { .glance { grid-template-columns: minmax(0, 1fr); } }
+.mc-ring { display: grid; justify-items: center; gap: 6px; }
+.mc-ring-big { font: 700 20px var(--font-display); fill: var(--text-primary); }
+.mc-ring-sub { font-size: 9.5px; fill: var(--text-muted); }
+.mc-ring-label { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); text-align: center; }
+.mc-hbars { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.mc-hbars li { display: grid; grid-template-columns: minmax(90px, 38%) minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 13px; }
+.mc-hbar-label { color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mc-hbar-track { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.mc-hbar-fill { display: block; height: 100%; border-radius: 999px; }
+.mc-hbar-val { font-weight: 650; color: var(--text-primary); min-width: 28px; text-align: right; }
+.mc-stack-bar { display: flex; height: 100%; gap: 2px; }
+.mc-stack-bar span { display: block; height: 100%; }
+.mc-stack-bar span:first-child { border-radius: 999px 0 0 999px; }
+.mc-stack-bar span:last-child { border-radius: 0 999px 999px 0; }
+.mc-stack-bar span:only-child { border-radius: 999px; }
+.mc-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 12px; color: var(--text-muted); }
+.mc-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.mc-legend i { width: 9px; height: 9px; border-radius: 3px; display: inline-block; }
+.chart-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+.chart-pair > .card { padding: 18px 20px; min-width: 0; }
+.chart-pair h3 { margin: 0 0 4px; font-size: 15px; }
+.chart-pair .note { margin: 0 0 14px; }
+@media (max-width: 900px) { .chart-pair { grid-template-columns: minmax(0, 1fr); } }
+
+/* Page header: breadcrumb on its own line above the title */
+html body .page-header > div:first-child .crumbs { flex-basis: 100%; margin-bottom: 2px; }
+/* Wordmark "IQ" on the dark sidebar: light cyan gradient */
+html body .leftnav .rz-name span { background: linear-gradient(90deg, #7aa2ff, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.seo-summary p.is-clamped { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+@media print { .seo-summary p.is-clamped { display: block; -webkit-line-clamp: unset; } }

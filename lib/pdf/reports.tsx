@@ -347,7 +347,7 @@ async function seoPdf(domain: string, p: Params) {
   const plan = page.plan.plan as SeoPlan;
   const g = d.gsc;
   const ctr = (x: { clicks: number; impressions: number }) => (x.impressions ? x.clicks / x.impressions : 0);
-  const scope = `Plan of ${new Date(page.plan.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}${d.periods ? ` · data ${d.periods.cur[0]} to ${d.periods.cur[1]}` : ""}${plan.writtenBy ? ` · written by ${plan.writtenBy}` : ""}`;
+  const scope = `Plan of ${new Date(page.plan.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}${d.periods ? ` · data ${d.periods.cur[0]} to ${d.periods.cur[1]}` : ""}`;
   const when = { "30": "Days 1-30", "60": "Days 31-60", "90": "Days 61-90" } as const;
   const o = d.opportunities;
 

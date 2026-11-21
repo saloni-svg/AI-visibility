@@ -23,6 +23,9 @@ const PATHS = {
   download: (<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5" /><path d="M12 3v12" /></>),
   sort: <path d="M3 6h18M6 12h12M10 18h4" />,
   alert: (<><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></>),
+  bot: (<><rect width="16" height="12" x="4" y="8" rx="3" /><path d="M12 8V4M8 4h8" /><path d="M9 13v2M15 13v2" /></>),
+  pulse: <path d="M22 12h-4l-3 8L9 4l-3 8H2" />,
+  chart: (<><path d="M3 3v18h18" /><path d="M7 15v2M11 11v6M15 7v10M19 12v5" /></>),
 };
 
 export type IconName = keyof typeof PATHS;

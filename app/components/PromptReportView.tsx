@@ -397,7 +397,7 @@ export default function PromptReportView({ report, stale, countries }: { report:
 
           <p className="note pr-footnote">
             Prompts, AI search volume, answers, cited sources and fan-out queries: DataForSEO LLM Mentions ({r.totals.byPlatform.map((b) => PLATFORM_LABEL[b.platform]).join(" and ")}, {countries.find((c) => c.code === r.country)?.name}).
-            {r.classifier === "ai" ? " Topics, intent and brand names are worked out by AI from the prompts and their answers." : " Topics and intent are estimated from the wording of each prompt."}
+            {r.classifier === "ai" ? " Topics, intent and brand names are worked out automatically from the prompts and their answers." : " Topics and intent are estimated from the wording of each prompt."}
             {r.months.length > 1 && " The trend only includes months that most prompts have data for."}
           </p>
         </>

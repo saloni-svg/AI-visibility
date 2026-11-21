@@ -51,7 +51,7 @@ export default function SeoRunner({ domain, running, lastError }: {
       <form onSubmit={start} className="agent-form">
         <div className="agent-form-text">
           <h2>Run the SEO agent</h2>
-          <p className="note">Takes 1–3 minutes. Reads Search Console, GA4, rankings, the site audit and AI visibility, then Claude writes a 30/60/90-day plan.</p>
+          <p className="note">Takes 1–3 minutes. Reads Search Console, GA4, rankings, the site audit and AI visibility, then writes a 30/60/90-day plan.</p>
         </div>
         <label htmlFor="seo-focus" className="sr-only">Focus (optional)</label>
         <input id="seo-focus" value={focus} onChange={(e) => setFocus(e.target.value)} disabled={busy}

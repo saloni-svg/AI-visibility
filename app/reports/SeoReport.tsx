@@ -6,6 +6,7 @@ import { loadSeoPage, type SeoData, type Sources } from "@/lib/seo-agent";
 import { db } from "@/lib/supabase";
 import { hasWindsor } from "@/lib/windsor";
 import Icon from "../components/Icon";
+import { HBars } from "../components/MiniCharts";
 import ReportActions from "../components/ReportActions";
 import SeoPlanView from "../components/SeoPlanView";
 import SeoRunner from "../components/SeoRunner";
@@ -16,10 +17,9 @@ const pct = (a: number, b: number) => (b ? Math.round(((a - b) / b) * 100) : nul
 const short = (u: string) => u.replace(/^https?:\/\/(www\.)?[^/]+/, "") || "/";
 const fmtDate = (d: string) => new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-// The steps the agent took for this plan (what showed live while it ran), who wrote it and the cost.
+// The steps the agent took for this plan (what showed live while it ran) and how long it took.
 function HowMade({ plan }: { plan: NonNullable<Awaited<ReturnType<typeof loadSeoPage>>["plan"]> }) {
   const log = plan.log ?? [];
-  const u = plan.plan.usage;
   const secs = plan.finished_at ? Math.round((new Date(plan.finished_at).getTime() - new Date(plan.created_at).getTime()) / 1000) : null;
   const icon = { think: "sparkles", tool: "database", done: "check", error: "alert" } as const;
   return (
@@ -27,9 +27,8 @@ function HowMade({ plan }: { plan: NonNullable<Awaited<ReturnType<typeof loadSeo
       <summary>
         <span className="seo-howmade-title"><Icon name="sparkles" size={15} /> How this plan was made</span>
         <span className="note">
-          {plan.plan.writtenBy ? <>Written by <b>{plan.plan.writtenBy}</b></> : "Written by the previous model (before Claude)"}
-          {secs != null ? ` · ${Math.floor(secs / 60)} min ${secs % 60} s` : ""}
-          {u ? ` · ${u.inputTokens.toLocaleString("en-IN")} tokens read, ${u.outputTokens.toLocaleString("en-IN")} written · $${u.costUsd.toFixed(2)}` : ""}
+          {log.length ? `${log.length} steps` : ""}
+          {secs != null ? `${log.length ? " · " : ""}${Math.floor(secs / 60)} min ${secs % 60} s` : ""}
         </span>
       </summary>
       {log.length > 0 && (
@@ -98,7 +97,7 @@ export default async function SeoReport({ domain, params, shared = false }: { do
           <p className="crumbs">Home <span aria-hidden="true">›</span> AI Agents <span aria-hidden="true">›</span> SEO agent</p>
           <h1>SEO plan: <span className="muted-strong">{domain}</span></h1>
           <p className="subtitle">Real Search Console and GA4 data (through Windsor.ai), your rankings, site audit and AI visibility, turned into a prioritised 90-day plan.</p>
-          {plan && <p className="note shared-filters">Plan of {fmtDate(plan.created_at)}{plan.focus ? ` · focus: ${plan.focus}` : ""}{d?.periods ? ` · data ${fmtDate(d.periods.cur[0])} – ${fmtDate(d.periods.cur[1])}` : ""}{plan.plan.writtenBy ? ` · written by ${plan.plan.writtenBy}` : ""}</p>}
+          {plan && <p className="note shared-filters">Plan of {fmtDate(plan.created_at)}{plan.focus ? ` · focus: ${plan.focus}` : ""}{d?.periods ? ` · data ${fmtDate(d.periods.cur[0])} – ${fmtDate(d.periods.cur[1])}` : ""}</p>}
         </div>
         {plan && (
           <div className="header-actions">
@@ -226,6 +225,28 @@ function Evidence({ d }: { d: SeoData }) {
   return (
     <>
       <h2 className="seo-section">The data behind the plan</h2>
+      <div className="chart-pair">
+        <section className="card">
+          <h3>What the data found</h3>
+          <p className="note">Number of pages or search terms in each group below.</p>
+          <HBars rows={[
+            { label: "Quick wins", value: o.quickWins.length },
+            { label: "Low click-through rate", value: o.lowCtr.length },
+            { label: "Declining pages", value: o.decaying.length, color: "var(--bad)" },
+            { label: "Competing pages", value: o.cannibal.length, color: "var(--c3)" },
+            { label: "Beyond page 2", value: o.deepQueries.length, color: "var(--c4)" },
+            { label: "Converting pages", value: o.converting.length, color: "var(--good)" },
+          ]} />
+        </section>
+        {o.quickWins.length > 0 && (
+          <section className="card">
+            <h3>Biggest quick wins</h3>
+            <p className="note">Estimated extra clicks a month if the page reached position 3.</p>
+            <HBars color="var(--c1)" format={(v) => `+${n(v)}`}
+              rows={[...o.quickWins].sort((a, b) => b.extraClicks - a.extraClicks).slice(0, 7).map((q) => ({ label: q.query, value: q.extraClicks, title: `${q.query}: position ${q.position}, +${n(q.extraClicks)} clicks` }))} />
+          </section>
+        )}
+      </div>
       <Table title="Quick wins" note="Search terms ranking 4–15 with real demand. Extra clicks = estimate if the page reached position 3."
         head={["Search term", "Position", "Impressions", "Clicks", "CTR", "Extra clicks"]}
         rows={o.quickWins.map((q) => [<span key="q"><b>{q.query}</b><br /><PageLink url={q.page} /></span>, q.position, n(q.impressions), n(q.clicks), `${q.ctr}%`, `+${n(q.extraClicks)}`])} />

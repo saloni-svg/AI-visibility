@@ -301,8 +301,8 @@ function TopicsTable({ topics, opportunities }: { topics: Data["performingTopics
     <div className="table-scroll">
       <div className="topic-grid topic-head">
         <span>Topic</span>
-        <span className="num">{opportunities ? "Brands named instead" : "Visibility"}</span>
-        <span className="num">Your mentions</span>
+        <span className={opportunities ? "" : "num"}>{opportunities ? "Brands named instead" : "Visibility"}</span>
+        <span className="num">Mentions</span>
         <span className="num">AI volume</span>
         <span>Intent</span>
       </div>
@@ -312,7 +312,9 @@ function TopicsTable({ topics, opportunities }: { topics: Data["performingTopics
           <details key={t.name} className="topic-row">
             <summary className="topic-grid">
               <span className="topic-name"><Icon name="chevron" size={14} />{t.name}</span>
-              <span className="num">{opportunities ? <span className="muted">{t.topBrands.join(", ") || "–"}</span> : <b>{t.visibility}</b>}</span>
+              {opportunities ? (
+                <span className="topic-brands">{t.topBrands.length ? t.topBrands.map((b) => <span key={b} className="brand-chip">{b}</span>) : "–"}</span>
+              ) : <span className="num"><b>{t.visibility}</b></span>}
               <span className="num">{t.mentions}<span className="muted">/{t.answers}</span></span>
               <span className="num volume">
                 <Sparkline values={t.volume?.monthly ?? []} />
@@ -359,7 +361,10 @@ function TopicsTable({ topics, opportunities }: { topics: Data["performingTopics
   );
 }
 
+const FIRST_ROWS = 12;
+
 function SimpleTable({ head, rows, empty }: { head: string[]; rows: React.ReactNode[][]; empty: string }) {
+  const [all, setAll] = useState(false);
   if (!rows.length) {
     return (
       <div className="inline-empty panel-body">
@@ -375,11 +380,16 @@ function SimpleTable({ head, rows, empty }: { head: string[]; rows: React.ReactN
           <tr>{head.map((h, i) => <th key={h} className={i > 0 && i < 3 && typeof rows[0][i] === "number" ? "num" : ""}>{h}</th>)}</tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => (
+          {(all ? rows : rows.slice(0, FIRST_ROWS)).map((r, i) => (
             <tr key={i}>{r.map((c, j) => <td key={j} className={typeof c === "number" ? "num" : ""} style={j === 0 ? { overflowWrap: "anywhere" } : undefined}>{c}</td>)}</tr>
           ))}
         </tbody>
       </table>
+      {rows.length > FIRST_ROWS && (
+        <button type="button" className="show-more" onClick={() => setAll(!all)}>
+          {all ? "Show fewer" : `Show all ${rows.length}`}
+        </button>
+      )}
     </div>
   );
 }

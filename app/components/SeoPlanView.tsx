@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateSeoAction } from "../(dashboard)/actions";
 import type { PlanAction, SeoPlan } from "@/lib/seo-agent";
+import { HBars, Ring, StackRows } from "./MiniCharts";
 
 const CATEGORY: Record<PlanAction["category"], string> = {
   quick_win: "Quick win", ctr: "Click-through rate", content_refresh: "Content refresh", new_content: "New content",
@@ -17,6 +18,7 @@ export default function SeoPlanView({ domain, planId, plan, shared = false }: { 
   const [actions, setActions] = useState(plan.actions);
   const [when, setWhen] = useState<"all" | "30" | "60" | "90">("all");
   const [error, setError] = useState("");
+  const [moreSummary, setMoreSummary] = useState(false);
 
   async function mark(a: PlanAction, status: "todo" | "done" | "dismissed") {
     setActions((l) => l.map((x) => (x.id === a.id ? { ...x, status } : x)));
@@ -33,11 +35,33 @@ export default function SeoPlanView({ domain, planId, plan, shared = false }: { 
       <section className="card panel seo-summary">
         <div className="panel-head"><div className="panel-title"><h2>Summary</h2></div></div>
         <div className="panel-body">
-          <p>{plan.summary}</p>
+          <p className={moreSummary ? "" : "is-clamped"}>{plan.summary}</p>
+          {plan.summary.length > 320 && (
+            <button type="button" className="link-btn no-print" onClick={() => setMoreSummary(!moreSummary)}>{moreSummary ? "Show less" : "Read full summary"}</button>
+          )}
           {plan.priorities.length > 0 && (
             <ol className="seo-priorities">{plan.priorities.map((p, i) => <li key={i}>{p}</li>)}</ol>
           )}
           {plan.progress && <p className="note"><b>Since the last plan:</b> {plan.progress}</p>}
+        </div>
+      </section>
+
+      <section className="card glance" aria-label="Plan at a glance">
+        <Ring value={done} total={live.length} label="Actions done" color="var(--good)" />
+        <div>
+          <h3>Actions per period, by priority</h3>
+          <StackRows
+            keys={[{ key: "high", label: "High", color: "var(--you)" }, { key: "medium", label: "Medium", color: "var(--c1)" }, { key: "low", label: "Low", color: "var(--baseline)" }]}
+            rows={(["30", "60", "90"] as const).map((t) => ({
+              label: WHEN[t],
+              parts: Object.fromEntries((["high", "medium", "low"] as const).map((p) => [p, live.filter((a) => a.timeframe === t && a.priority === p).length])),
+            }))}
+          />
+        </div>
+        <div>
+          <h3>Actions by type</h3>
+          <HBars rows={Object.entries(live.reduce<Record<string, number>>((m, a) => ({ ...m, [a.category]: (m[a.category] ?? 0) + 1 }), {}))
+            .sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, v]) => ({ label: CATEGORY[k as PlanAction["category"]] ?? k, value: v }))} color="var(--c1)" />
         </div>
       </section>
 

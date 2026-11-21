@@ -24,6 +24,20 @@ const FEATURE: Record<string, string> = {
   popular_products: "Popular products", google_shopping: "Shopping", twitter: "X posts", perspectives: "Perspectives", discussions_and_forums: "Forums", map: "Map",
 };
 const PAGE = 10;
+
+// A result link as a short, readable label: no "https://www.", no tracking parameters, and long
+// redirect links (e.g. google.com/goto?url=…) cut to their address. The full link stays in href/title.
+function shortUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./, "");
+    const path = decodeURI(u.pathname).replace(/\/$/, "");
+    const label = `${host}${path}`;
+    return label.length > 72 ? `${label.slice(0, 70)}…` : label;
+  } catch {
+    return url.length > 72 ? `${url.slice(0, 70)}…` : url;
+  }
+}
 const money = (n: number, currency = "USD") => new Intl.NumberFormat("en", { style: "currency", currency }).format(n);
 
 function KdDot({ kd }: { kd: number | null }) {
@@ -224,7 +238,7 @@ export default function KeywordOverview({ report: r, rates }: { report: KeywordR
           </div>
           <div>
             <span className="kw-label">Keyword Strategy</span>
-            <p className="note kw-strategy-note">Topics, pillar and subpages, grouped <b>automatically</b> by AI</p>
+            <p className="note kw-strategy-note">Topics, pillar and subpages, grouped <b>automatically</b></p>
             <ul className="kw-tree">
               <li className="kw-pillar">{r.clusters.pillar}</li>
               {r.clusters.pages.map((p) => (
@@ -314,7 +328,7 @@ export default function KeywordOverview({ report: r, rates }: { report: KeywordR
             <button key={i} aria-pressed={page === i} onClick={() => setPage(i)}>{i * PAGE + 1}-{i * PAGE + PAGE}</button>
           ))}
         </div>
-        <div className="table-wrap">
+        <div className="table-wrap kw-serp-wrap">
           <table className="kw-serp-table">
             <thead>
               <tr>
@@ -332,7 +346,7 @@ export default function KeywordOverview({ report: r, rates }: { report: KeywordR
                     <td className="kw-url-cell">
                       {mode === "url" ? (
                         <>
-                          <a href={x.url} target="_blank" rel="noreferrer" className="url">{x.url} ↗</a>
+                          <a href={x.url} target="_blank" rel="noreferrer" className="url" title={x.url}>{shortUrl(x.url)} ↗</a>
                           <b className="kw-domain">{x.domain}</b>
                         </>
                       ) : <a href={`https://${x.domain}`} target="_blank" rel="noreferrer" className="url"><b>{x.domain}</b></a>}

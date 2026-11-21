@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { updateDraft } from "../(dashboard)/actions";
 import Icon from "./Icon";
+import { HBars, Ring } from "./MiniCharts";
 
 type Draft = {
   id: string; kind: string; title: string; target_url: string | null; target_questions: string[];
@@ -40,7 +41,30 @@ export default function DraftList({ domain, drafts }: { domain: string; drafts: 
     URL.revokeObjectURL(url);
   };
 
+  const live = drafts.filter((d) => d.status !== "dismissed");
+  const questions = new Set(live.flatMap((d) => d.target_questions));
+  const doneQuestions = new Set(live.filter((d) => d.status === "done").flatMap((d) => d.target_questions));
+
   return (
+    <>
+    {live.length > 0 && (
+      <section className="card glance" aria-label="Drafts at a glance">
+        <Ring value={count("done")} total={live.length} label="Drafts published" color="var(--good)" />
+        <div>
+          <h3>Drafts by type</h3>
+          <HBars rows={Object.entries(live.reduce<Record<string, number>>((m, d) => ({ ...m, [d.kind]: (m[d.kind] ?? 0) + 1 }), {}))
+            .sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ label: KIND[k] ?? k, value: v }))} />
+        </div>
+        <div>
+          <h3>AI questions covered</h3>
+          <HBars rows={[
+            { label: "Targeted by a draft", value: questions.size, color: "var(--c1)" },
+            { label: "Published", value: doneQuestions.size, color: "var(--good)" },
+          ]} />
+          <p className="note" style={{ marginTop: 10 }}>Mark drafts as published once they&apos;re live, so the next run can measure their effect.</p>
+        </div>
+      </section>
+    )}
     <section className="card cr-table-card">
       <div className="cr-table-head">
         <h2>Drafts <span className="muted">({drafts.length})</span></h2>
@@ -81,5 +105,6 @@ export default function DraftList({ domain, drafts }: { domain: string; drafts: 
         </ul>
       )}
     </section>
+    </>
   );
 }
