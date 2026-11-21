@@ -314,3 +314,9 @@ html body .leftnav-group a:hover { background: #24377a; color: #fff; }
 html body .leftnav-group a[aria-current="page"] { background: #2d48a8; color: #fff; }
 html body .leftnav-disabled { color: #8494c4; }
 html body .leftnav-topic:hover { background: #22357a; }
+
+/* Top bar on pages without the domain box: show the page name on the left */
+.appbar-page { margin: 0 auto 0 0; display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-muted); }
+.appbar-page b { color: var(--text-primary); font-weight: 650; }
+/* Prompt research: less space above the hero card */
+html body .dash.pr-page { padding-top: 18px; }
